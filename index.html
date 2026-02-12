@@ -270,7 +270,7 @@
       box-shadow: 0 0 0 2px rgba(64,201,255,.42), 0 0 34px rgba(64,201,255,.28), 0 18px 50px rgba(0,0,0,.40);
     }
 
-    /* Name + Saetze/Legs rechts daneben, deutlich groesser */
+    /* Name + Sätze/Legs rechts daneben, deutlich groesser */
     .restMeta{
       display:flex;
       flex-direction:column;
@@ -530,7 +530,7 @@
 <!-- ===== Checkout Darts Popup ===== -->
 <div class="winOverlay" id="dartsOverlay" aria-hidden="true">
   <div class="winCard">
-    <div class="h">Checkout bestaetigen</div>
+    <div class="h">Checkout bestätigen</div>
     <div class="p">Wie viele Darts hast du gebraucht?</div>
     <div class="actions" style="gap:12px; flex-wrap:wrap">
       <button class="primary" data-darts="1" style="min-width:110px; padding:16px 18px; font-size:22px; border-radius:16px">1</button>
@@ -544,7 +544,7 @@
 <!-- ===== Ausbullen Popup (Option A) ===== -->
 <div class="winOverlay" id="bullOverlay" aria-hidden="true">
   <div class="winCard">
-    <div class="h">Wer hat ausgebullt?</div>
+    <div class="h">Wer hät s'Bulle gwunne?</div>
     <div class="p">Dieser Spieler beginnt Leg 1.</div>
     <div class="bullBtns">
       <button class="bullBtn shark" id="bullShark">Shark</button>
@@ -575,8 +575,8 @@
         <div class="bigscore"><span id="score0">501</span> <small>Rest</small></div>
 
         <div class="row">
-          <div class="pill"><div class="k">Saetze</div><div class="v big" id="sets0">0</div></div>
-          <div class="pill"><div class="k">Legs (Satz)</div><div class="v big" id="legs0">0</div></div>
+          <div class="pill"><div class="k">Sätze</div><div class="v big" id="sets0">0</div></div>
+          <div class="pill"><div class="k">Legs</div><div class="v big" id="legs0">0</div></div>
         </div>
 
         <div class="sep"></div>
@@ -590,7 +590,7 @@
           <li class="miniItem"><span class="k">Aufnahmen ≥ 100</span><span class="v" id="g100_0">0</span></li>
           <li class="miniItem"><span class="k">Aufnahmen ≥ 140</span><span class="v" id="g140_0">0</span></li>
           <li class="miniItem"><span class="k">Anzahl 180er</span><span class="v" id="d180_0">0</span></li>
-          <li class="miniItem"><span class="k">Hoechstes Checkout</span><span class="v" id="hco_0">—</span></li>
+          <li class="miniItem"><span class="k">Höchstes Checkout</span><span class="v" id="hco_0">—</span></li>
         </ul>
       </div>
     </section>
@@ -604,7 +604,7 @@
         <div class="bigscore"><span id="score1">501</span> <small>Rest</small></div>
 
         <div class="row">
-          <div class="pill"><div class="k">Saetze</div><div class="v big" id="sets1">0</div></div>
+          <div class="pill"><div class="k">Sätze</div><div class="v big" id="sets1">0</div></div>
           <div class="pill"><div class="k">Legs (Satz)</div><div class="v big" id="legs1">0</div></div>
         </div>
 
@@ -619,7 +619,7 @@
           <li class="miniItem"><span class="k">Aufnahmen ≥ 100</span><span class="v" id="g100_1">0</span></li>
           <li class="miniItem"><span class="k">Aufnahmen ≥ 140</span><span class="v" id="g140_1">0</span></li>
           <li class="miniItem"><span class="k">Anzahl 180er</span><span class="v" id="d180_1">0</span></li>
-          <li class="miniItem"><span class="k">Hoechstes Checkout</span><span class="v" id="hco_1">—</span></li>
+          <li class="miniItem"><span class="k">Höchstes Checkout</span><span class="v" id="hco_1">—</span></li>
         </ul>
       </div>
     </section>
@@ -631,7 +631,7 @@
       <div class="body">
         <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between">
           <div>
-            <div style="font-size:12px; color:var(--muted)">Saetze bis Matchgewinn</div>
+            <div style="font-size:12px; color:var(--muted)">Sätze bis Matchgewinn</div>
             <div style="margin-top:6px">
               <input id="setsToWin" type="number" min="1" max="25" step="1" inputmode="numeric"
                      style="width:160px; background:rgba(0,0,0,.28); border:1px solid var(--line); color:var(--txt); border-radius:12px; padding:10px 10px; font-size:16px; outline:none;">
@@ -686,7 +686,7 @@
           <div class="restMeta">
             <div class="nameRow">
               <div class="name">Shark</div>
-              <div class="stats" aria-label="Saetze und Legs">
+              <div class="stats" aria-label="Sätze und Legs">
                 <span class="lab">S</span><b id="mSets0">0</b>
                 <span class="lab">L</span><b id="mLegs0">0</b>
               </div>
@@ -699,7 +699,7 @@
           <div class="restMeta">
             <div class="nameRow">
               <div class="name">Snake</div>
-              <div class="stats" aria-label="Saetze und Legs">
+              <div class="stats" aria-label="Sätze und Legs">
                 <span class="lab">S</span><b id="mSets1">0</b>
                 <span class="lab">L</span><b id="mLegs1">0</b>
               </div>
@@ -977,7 +977,7 @@
       if (state.players[i].sets >= state.setsToWin){
         state.matchOver = true;
         state.winner = i;
-        pushLog({ player: players[i].name, input:"—", effect:"MATCH GEWONNEN", rest:"—", info:`bis ${state.setsToWin} Saetze` });
+        pushLog({ player: players[i].name, input:"—", effect:"MATCH GEWONNEN", rest:"—", info:`bis ${state.setsToWin} Sätze` });
         return true;
       }
     }
@@ -1324,7 +1324,7 @@
   }
 
   function resetMatch(){
-    if (!confirm("Wirklich neues Match starten? Alle Daten werden geloescht.")) return;
+    if (!confirm("Wirklich neues Match starten? Alle Daten werden gelöscht.")) return;
     const keep = Number(ui.setsToWin.value) || 3;
     state = freshState();
     state.setsToWin = keep;
@@ -1411,7 +1411,7 @@
     ui.curSet.textContent = state.currentSetNumber;
     ui.curLeg.textContent = state.currentLegNumber;
 
-    ui.matchInfo.textContent = `Match bis ${state.setsToWin} Saetze · Satzmodus: First to ${state.legsToWinSet} Winlegs · 501 Double Out`;
+    ui.matchInfo.textContent = `Match bis ${state.setsToWin} Sätze · Satzmodus: First to ${state.legsToWinSet} Winlegs · 501 Double Out`;
 
     for (let i=0;i<2;i++){
       const p = state.players[i];
