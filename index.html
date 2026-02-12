@@ -493,6 +493,36 @@
     #dartsOverlay .winCard{ width:min(720px, 98%); padding:28px 24px; animation: popIn .28s ease-out both; box-shadow: 0 30px 90px rgba(0,0,0,.60); }
     #dartsOverlay .winCard .h{ font-size:36px; }
     #dartsOverlay .winCard .p{ font-size:18px; }
+
+    /* ===== Ausbullen Overlay (Option A) ===== */
+    #bullOverlay .winCard{
+      width:min(760px, 98%);
+      padding:30px 24px;
+      animation: popIn .28s ease-out both;
+      box-shadow: 0 30px 90px rgba(0,0,0,.60);
+    }
+    #bullOverlay .winCard .h{ font-size:40px; }
+    #bullOverlay .winCard .p{ font-size:18px; }
+    #bullOverlay .bullBtns{
+      display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:18px;
+    }
+    #bullOverlay .bullBtn{
+      min-width:220px;
+      padding:18px 22px;
+      font-size:26px;
+      border-radius:18px;
+      font-weight:1000;
+    }
+    #bullOverlay .bullBtn.shark{
+      border-color: rgba(54,241,166,.80);
+      background: rgba(54,241,166,.14);
+      color: var(--acc);
+    }
+    #bullOverlay .bullBtn.snake{
+      border-color: rgba(64,201,255,.80);
+      background: rgba(64,201,255,.14);
+      color: var(--good);
+    }
   </style>
 </head>
 <body>
@@ -507,6 +537,18 @@
       <button class="primary" data-darts="2" style="min-width:110px; padding:16px 18px; font-size:22px; border-radius:16px">2</button>
       <button class="primary" data-darts="3" style="min-width:110px; padding:16px 18px; font-size:22px; border-radius:16px">3</button>
       <button class="ghost" id="dartsCancelBtn" style="padding:16px 18px; font-size:18px; border-radius:16px">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Ausbullen Popup (Option A) ===== -->
+<div class="winOverlay" id="bullOverlay" aria-hidden="true">
+  <div class="winCard">
+    <div class="h">Wer hat ausgebullt?</div>
+    <div class="p">Dieser Spieler beginnt Leg 1.</div>
+    <div class="bullBtns">
+      <button class="bullBtn shark" id="bullShark">Shark</button>
+      <button class="bullBtn snake" id="bullSnake">Snake</button>
     </div>
   </div>
 </div>
@@ -596,7 +638,7 @@
             </div>
           </div>
           <div style="display:flex; gap:10px; flex-wrap:wrap">
-            <button class="primary" id="openEntryBtn" style="padding:14px 16px; font-size:16px; border-radius:14px">Eingabe oeffnen</button>
+            <button class="primary" id="openEntryBtn" style="padding:14px 16px; font-size:16px; border-radius:14px">Game On</button>
             <button class="ghost" id="switchBtn">Spieler wechseln</button>
             <button class="ghost" id="retourBtn">Retour</button>
           </div>
@@ -779,6 +821,11 @@
 
     dartsOverlay: el("dartsOverlay"),
     dartsCancelBtn: el("dartsCancelBtn"),
+
+    // Ausbullen (Option A)
+    bullOverlay: el("bullOverlay"),
+    bullShark: el("bullShark"),
+    bullSnake: el("bullSnake"),
   };
 
   const nowTime = () => {
@@ -809,8 +856,12 @@
   const freshState = () => ({
     setsToWin: 3,
 
+    // Anwurf-Logik
     legStarter: 0,
     nextLegStarter: 1,
+
+    // NEW: merken, ob Ausbullen bereits gesetzt wurde
+    bullChosen: false,
 
     currentPlayer: 0,
     currentSetNumber: 1,
@@ -834,9 +885,11 @@
       const p = JSON.parse(raw);
       if (p && p.players && p.players.length === 2) state = p;
 
+      // Backward-Compatibility
       if (state.legStarter === undefined || state.legStarter === null) state.legStarter = 0;
       if (state.nextLegStarter === undefined || state.nextLegStarter === null) state.nextLegStarter = state.legStarter === 0 ? 1 : 0;
       if (state.currentPlayer === undefined || state.currentPlayer === null) state.currentPlayer = state.legStarter;
+      if (state.bullChosen === undefined || state.bullChosen === null) state.bullChosen = false;
     } catch(e){}
   }
 
@@ -848,6 +901,7 @@
       setsToWin: state.setsToWin,
       legStarter: state.legStarter,
       nextLegStarter: state.nextLegStarter,
+      bullChosen: state.bullChosen,
       currentPlayer: state.currentPlayer,
       currentSetNumber: state.currentSetNumber,
       currentLegNumber: state.currentLegNumber,
@@ -868,6 +922,7 @@
 
     state.legStarter = (prev.legStarter ?? 0);
     state.nextLegStarter = (prev.nextLegStarter ?? (state.legStarter === 0 ? 1 : 0));
+    state.bullChosen = (prev.bullChosen ?? false);
 
     state.currentPlayer = prev.currentPlayer;
     state.currentSetNumber = prev.currentSetNumber;
@@ -943,33 +998,32 @@
   }
 
   function askCheckoutMeta(){
-  // Kein Windows-confirm mehr -> direkt Button-Popup
-  return new Promise((resolve) => {
-    ui.dartsOverlay.classList.add("open");
-    ui.dartsOverlay.setAttribute("aria-hidden","false");
+    // Kein Windows-confirm mehr -> direkt Button-Popup
+    return new Promise((resolve) => {
+      ui.dartsOverlay.classList.add("open");
+      ui.dartsOverlay.setAttribute("aria-hidden","false");
 
-    const cleanup = () => {
-      ui.dartsOverlay.classList.remove("open");
-      ui.dartsOverlay.setAttribute("aria-hidden","true");
-      ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(b => b.onclick = null);
-      ui.dartsCancelBtn.onclick = null;
-    };
+      const cleanup = () => {
+        ui.dartsOverlay.classList.remove("open");
+        ui.dartsOverlay.setAttribute("aria-hidden","true");
+        ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(b => b.onclick = null);
+        ui.dartsCancelBtn.onclick = null;
+      };
 
-    ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(btn => {
-      btn.onclick = () => {
-        const dartsUsed = Number(btn.getAttribute("data-darts")) || 3;
+      ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(btn => {
+        btn.onclick = () => {
+          const dartsUsed = Number(btn.getAttribute("data-darts")) || 3;
+          cleanup();
+          resolve({ dartsUsed, doubleOutConfirmed: true });
+        };
+      });
+
+      ui.dartsCancelBtn.onclick = () => {
         cleanup();
-        resolve({ dartsUsed, doubleOutConfirmed: true });
+        resolve(null); // entspricht "abbrechen" (Restore aus History)
       };
     });
-
-    ui.dartsCancelBtn.onclick = () => {
-      cleanup();
-      resolve(null); // entspricht "abbrechen" (Restore aus History)
-    };
-  });
-}
-
+  }
 
   function typedToNumber(){
     if (!state.typed) return null;
@@ -981,6 +1035,10 @@
 
   function openEntry(){
     if (state.matchOver) return;
+    if (!state.bullChosen){
+      openBull(); // blocke Eingabe bis Ausbullen gesetzt ist
+      return;
+    }
     ui.entryOverlay.classList.add("open");
     ui.entryOverlay.setAttribute("aria-hidden","false");
     updateUI();
@@ -1078,6 +1136,8 @@
 
   function appendDigit(d){
     if (state.matchOver) return;
+    if (!state.bullChosen){ openBull(); return; }
+
     if (state.typed === "0") state.typed = "";
     const next = (state.typed || "") + String(d);
     const val = Number(next);
@@ -1106,8 +1166,41 @@
     state.currentPlayer = state.legStarter;
   }
 
+  // ===== Ausbullen (Option A) =====
+  function openBull(){
+    ui.bullOverlay.classList.add("open");
+    ui.bullOverlay.setAttribute("aria-hidden","false");
+  }
+  function closeBull(){
+    ui.bullOverlay.classList.remove("open");
+    ui.bullOverlay.setAttribute("aria-hidden","true");
+  }
+  function setBullWinner(idx){
+    snapshot();
+    state.bullChosen = true;
+    state.legStarter = idx;
+    state.nextLegStarter = idx === 0 ? 1 : 0;
+    state.currentPlayer = idx;
+    pushLog({ player: players[idx].name, input:"—", effect:"ANWURF (AUSBULLEN)", rest:"—", info:"Leg 1 Startspieler" });
+    save(); updateUI();
+  }
+  function isFreshMatch(){
+    return (
+      (state.log?.length ?? 0) === 0 &&
+      state.currentSetNumber === 1 &&
+      state.currentLegNumber === 1 &&
+      state.players[0].score === 501 && state.players[1].score === 501 &&
+      state.players[0].sets === 0 && state.players[1].sets === 0 &&
+      state.players[0].legsInSet === 0 && state.players[1].legsInSet === 0
+    );
+  }
+
   async function bookVisit(){
     if (state.matchOver) return;
+    if (!state.bullChosen){
+      openBull();
+      return;
+    }
 
     const setsToWin = Number(ui.setsToWin.value);
     if (Number.isFinite(setsToWin) && setsToWin >= 1) state.setsToWin = Math.floor(setsToWin);
@@ -1143,25 +1236,6 @@
       const meta = await askCheckoutMeta();
       if (meta === null){
         restoreFromHistory();
-        return;
-      }
-
-      if (!meta.doubleOutConfirmed){
-        newRest = startRest;
-        countVisitBucket(p, 0);
-        p.totalDarts += 3;
-
-        pushLog({
-          player: players[i].name,
-          input: String(v),
-          effect: "0",
-          rest: String(newRest),
-          info: "Checkout nicht bestaetigt (Bust)"
-        });
-
-        clearTyped();
-        nextPlayer();
-        save(); updateUI();
         return;
       }
 
@@ -1255,6 +1329,7 @@
     state = freshState();
     state.setsToWin = keep;
     save(); updateUI();
+    openBull(); // nach Reset immer Ausbullen fragen
   }
 
   function renderKeypads(){
@@ -1266,6 +1341,7 @@
       b.textContent = String(v);
       b.addEventListener("click", () => {
         if (state.matchOver) return;
+        if (!state.bullChosen){ openBull(); return; }
         state.typed = String(v);
         save(); updateUI();
       });
@@ -1287,7 +1363,7 @@
     const back = document.createElement("button");
     back.type = "button";
     back.className = "action";
-    back.textContent = "Letzte Zahl loeschen";
+    back.textContent = "Letzte Zahl weg";
     back.addEventListener("click", backspace);
     ui.pad.appendChild(back);
 
@@ -1296,7 +1372,7 @@
     const clr = document.createElement("button");
     clr.type = "button";
     clr.className = "action";
-    clr.textContent = "Loeschen";
+    clr.textContent = "Löschen";
     clr.addEventListener("click", clearAll);
     ui.pad.appendChild(clr);
   }
@@ -1389,6 +1465,7 @@
     updateTurnHighlight();
   }
 
+  // events
   ui.resetBtn.addEventListener("click", resetMatch);
   ui.switchBtn.addEventListener("click", switchPlayerManual);
   ui.retourBtn.addEventListener("click", restoreFromHistory);
@@ -1411,12 +1488,18 @@
     }
   });
 
+  // Ausbullen Buttons
+  ui.bullShark.addEventListener("click", () => { setBullWinner(0); closeBull(); });
+  ui.bullSnake.addEventListener("click", () => { setBullWinner(1); closeBull(); });
+
+  // init
   load();
   if (!Number.isFinite(state.setsToWin) || state.setsToWin < 1) state.setsToWin = 3;
 
-  if (state.legStarter === undefined || state.legStarter === null) state.legStarter = 0;
-  if (state.nextLegStarter === undefined || state.nextLegStarter === null) state.nextLegStarter = state.legStarter === 0 ? 1 : 0;
-  if (state.currentPlayer === undefined || state.currentPlayer === null) state.currentPlayer = state.legStarter;
+  // Wenn match frisch und noch nicht ausge-bullt -> frage anzeigen
+  if (!state.bullChosen && isFreshMatch()){
+    openBull();
+  }
 
   renderKeypads();
   updateUI();
