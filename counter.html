@@ -1,0 +1,1354 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dartcounter – 501 Double Out (Shark vs Snake)</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --txt:#e9eef6;
+      --muted:#9fb0c7;
+      --line:#223246;
+
+      --acc:#36f1a6;
+      --good:#40c9ff;
+      --bad:#ff4d6d;
+      --warn:#ffcc66;
+
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --r: 18px;
+
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+      --turnGlow: 0 0 0 2px rgba(54,241,166,.38), 0 0 26px rgba(54,241,166,.22), 0 18px 50px rgba(0,0,0,.40);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:var(--sans); color:var(--txt);
+      background: radial-gradient(1200px 700px at 30% -10%, #203a66 0%, rgba(32,58,102,0) 55%),
+                  radial-gradient(900px 500px at 110% 10%, #1d4c38 0%, rgba(29,76,56,0) 60%),
+                  var(--bg);
+      min-height:100vh;
+    }
+    header{
+      padding:18px 16px 10px;
+      max-width:1100px; margin:0 auto;
+      display:flex; gap:12px; align-items:flex-end; justify-content:space-between; flex-wrap:wrap;
+    }
+    .title{display:flex; flex-direction:column; gap:4px}
+    h1{margin:0; font-size:18px; letter-spacing:.2px}
+    .sub{color:var(--muted); font-size:13px}
+
+    main{max-width:1100px; margin:0 auto; padding:10px 16px 28px}
+
+    .topbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+    .chip{
+      font-size:12px; padding:6px 10px; border-radius:999px;
+      background: rgba(0,0,0,.22);
+      border:1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 880px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    .card.turn{
+      border-color: rgba(54,241,166,.68);
+      box-shadow: var(--turnGlow);
+      transform: translateY(-1px);
+    }
+
+    .card .head{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .pname{font-size:18px; font-weight:900; letter-spacing:.2px; display:flex; align-items:center; gap:10px}
+    .badge{
+      font-size:12px; padding:5px 10px; border-radius:999px;
+      border:1px solid var(--line); color:var(--muted);
+      background: rgba(0,0,0,.25);
+    }
+    .badge.turn{border-color: rgba(54,241,166,.70); color: var(--acc); background: rgba(54,241,166,.10)}
+    .badge.winner{border-color: rgba(64,201,255,.70); color: var(--good); background: rgba(64,201,255,.10)}
+
+    .body{padding:14px}
+
+    .bigscore{
+      font-family:var(--sans);
+      font-size:74px;
+      line-height:1;
+      font-weight:1000;
+      letter-spacing:.4px;
+      display:flex; align-items:baseline; gap:10px;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "zero" 0;
+    }
+    .bigscore small{
+      font-size:14px; color:var(--muted);
+      font-family:var(--sans); font-weight:700
+    }
+
+    .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+
+    .pill{
+      padding:10px 12px; border-radius:14px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.24);
+      min-width:160px;
+    }
+    .pill .k{font-size:12px; color:var(--muted)}
+    .pill .v{margin-top:2px; font-weight:1000; font-variant-numeric: tabular-nums; letter-spacing:.2px}
+    .pill .v.big{font-size:28px}
+
+    .sep{height:1px; background:var(--line); margin:14px 0}
+
+    .miniList{
+      margin:0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:8px 12px;
+    }
+    @media (max-width: 520px){ .miniList{grid-template-columns:1fr} }
+    .miniItem{
+      border:1px solid rgba(34,50,70,.75);
+      border-radius:14px;
+      padding:10px 12px;
+      background: rgba(0,0,0,.18);
+      display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+    }
+    .miniItem .k{font-size:12px; color:var(--muted)}
+    .miniItem .v{font-family:var(--mono); font-size:14px; font-weight:900; font-variant-numeric: tabular-nums}
+
+    .controls{
+      margin-top:12px;
+      display:grid; grid-template-columns: .9fr 1.1fr; gap:12px;
+      align-items:start;
+    }
+    @media (max-width: 880px){ .controls{grid-template-columns:1fr} }
+
+    .panel{
+      background: rgba(0,0,0,.22);
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel .head{padding:12px 14px; border-bottom:1px solid var(--line); color:var(--muted); font-size:13px}
+    .panel .body{padding:14px}
+
+    button{
+      cursor:pointer;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color:var(--txt);
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:14px;
+      transition: transform .06s ease, border-color .12s ease, background .12s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      white-space:nowrap;
+    }
+    button:active{transform: translateY(1px)}
+    button.primary{
+      border-color: rgba(54,241,166,.70);
+      background: rgba(54,241,166,.14);
+      color: var(--acc);
+      font-weight:900;
+    }
+    button.danger{
+      border-color: rgba(255,77,109,.70);
+      background: rgba(255,77,109,.12);
+      color: var(--bad);
+      font-weight:900;
+    }
+    button.ghost{
+      border-color: rgba(159,176,199,.35);
+      background: rgba(0,0,0,.18);
+      color: var(--muted);
+    }
+
+    .log{
+      margin-top:10px;
+      max-height:320px;
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background: rgba(0,0,0,.18);
+    }
+    .log table{width:100%; border-collapse:collapse; font-family:var(--mono); font-size:12px}
+    .log th,.log td{padding:10px 10px; border-bottom:1px solid rgba(34,50,70,.6); text-align:left}
+    .log th{color:var(--muted); font-family:var(--sans); font-size:12px}
+
+    /* ===== Modal: Eingabe (fast fullscreen + blur) ===== */
+    .modalOverlay{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
+      z-index: 50;
+    }
+    .modalOverlay.open{display:flex}
+
+    .modal{
+      width: min(1060px, 100%);
+      height: min(980px, 100vh);
+      border-radius: 22px;
+      border:1px solid rgba(34,50,70,.9);
+      background: linear-gradient(180deg, rgba(17,24,36,.98), rgba(10,14,20,.98));
+      box-shadow: 0 30px 90px rgba(0,0,0,.55);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .modalHead{
+      padding:14px 14px 10px;
+      border-bottom:1px solid rgba(34,50,70,.8);
+      display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .modalTitle{display:flex; flex-direction:column; gap:4px}
+    .modalTitle .t{font-weight:1000; letter-spacing:.2px}
+    .modalTitle .s{font-size:13px; color:var(--muted)}
+
+    .modalContent{padding:12px 14px; overflow:auto; flex:1}
+
+    .restBar{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 520px){ .restBar{grid-template-columns:1fr} }
+
+    .restBox{
+      border:1px solid rgba(34,50,70,.9);
+      background: rgba(0,0,0,.22);
+      border-radius:18px;
+      padding:14px 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .restBox.turn{
+      border-color: rgba(54,241,166,.75);
+      box-shadow: var(--turnGlow);
+    }
+    .restBox .name{
+  font-weight:1000;
+  font-size:20px;
+  line-height:1.1;
+}
+
+.meta2{
+  color: var(--muted);
+  font-size:13px;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.meta2 span{
+  color: var(--txt);
+  font-weight:900;
+}
+
+    .restBox .rest{
+      font-size:56px;
+      font-weight:1000;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "zero" 0;
+    }
+    .restBox .muted{color:var(--muted); font-size:12px; margin-top:2px}
+    .restMeta{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  align-items:flex-start;
+}
+
+
+    .typedRow{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:12px;
+      align-items:stretch;
+    }
+    @media (max-width: 760px){ .typedRow{grid-template-columns:1fr} }
+
+    .typedBig, .checkoutHint{
+      border:1px solid rgba(34,50,70,.9);
+      background: rgba(0,0,0,.22);
+      border-radius:18px;
+      padding:12px 12px;
+      display:flex; justify-content:space-between; align-items:flex-end; gap:10px;
+    }
+    .typedBig .k, .checkoutHint .k{font-size:12px; color:var(--muted)}
+    .typedBig .v{
+      font-size:56px;
+      font-weight:1000;
+      font-family:var(--mono);
+      letter-spacing:.4px;
+      font-variant-numeric: tabular-nums;
+    }
+    .checkoutHint{
+      flex-direction:column;
+      align-items:flex-start;
+      justify-content:center;
+      gap:8px;
+    }
+    .checkoutHint .t{
+      font-weight:1000;
+      color: var(--good);
+      font-size:16px;
+    }
+    .checkoutHint .list{
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+    .tag{
+      border:1px solid rgba(64,201,255,.55);
+      background: rgba(64,201,255,.10);
+      color: var(--good);
+      padding:6px 10px;
+      border-radius:999px;
+      font-family: var(--mono);
+      font-weight:900;
+      font-size:13px;
+    }
+
+    /* keypad area: links schmalere Tasten, rechts grosser OK */
+    .keypadArea{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: 1fr 170px;
+      gap:14px;
+      align-items:stretch;
+    }
+    @media (max-width: 760px){
+      .keypadArea{grid-template-columns: 1fr}
+    }
+
+    .leftPad{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .quickRow{
+      display:grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 760px){
+      .quickRow{grid-template-columns: repeat(4, 1fr);}
+    }
+    .quickRow button{
+      padding:14px 8px;
+      border-radius:16px;
+      font-size:16px;
+      font-weight:1000;
+      font-family: var(--mono);
+      border-color: rgba(64,201,255,.62);
+      background: rgba(64,201,255,.12);
+      color: var(--good);
+    }
+
+    /* 1-9 + bottom row (Backspace / 0 / Loeschen) */
+    .pad{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+    }
+    .pad button{
+      padding:18px 10px;         /* weniger breit/hoch */
+      border-radius:18px;
+      font-size:22px;
+      font-weight:1000;
+      font-family: var(--mono);
+      background: rgba(255,255,255,.06);
+      border-color: rgba(54,241,166,.35);
+    }
+
+    .pad button.action{
+      border-color: rgba(255,204,102,.62);
+      background: rgba(255,204,102,.12);
+      color: var(--warn);
+      font-family: var(--sans);
+      font-size:16px;
+      font-weight:900;
+    }
+
+    .okBig{
+      height:100%;
+      width:100%;
+      border-radius:20px;
+      font-size:26px;
+      font-weight:1000;
+      border-color: rgba(54,241,166,.80);
+      background: rgba(54,241,166,.16);
+      color: var(--acc);
+    }
+
+    .modalFoot{
+      border-top:1px solid rgba(34,50,70,.8);
+      padding:12px 14px;
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;
+    }
+
+    /* ===== Win Popup ===== */
+    
+.winOverlay{
+  position:fixed; inset:0;
+  display:none;
+  align-items:center; justify-content:center;
+  background: rgba(0,0,0,.70);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 60;
+  padding:16px;
+}
+.winOverlay.open{display:flex}
+.winCard{
+  width:min(520px, 100%);
+  border-radius:22px;
+  border:1px solid rgba(34,50,70,.9);
+  background: linear-gradient(180deg, rgba(17,24,36,.98), rgba(10,14,20,.98));
+  box-shadow: 0 30px 90px rgba(0,0,0,.55);
+  padding:18px 16px;
+  text-align:center;
+}
+.winCard .h{font-size:28px; font-weight:1000; letter-spacing:.2px}
+.winCard .p{margin-top:8px; color:var(--muted); font-size:14px}
+.winCard .who{margin-top:10px; font-size:34px; font-weight:1000; color: var(--good)}
+.winCard .actions{margin-top:14px; display:flex; justify-content:center}
+  </style>
+</head>
+<body>
+
+<!-- ===== Checkout Darts Popup ===== -->
+<div class="winOverlay" id="dartsOverlay" aria-hidden="true">
+  <div class="winCard">
+    <div class="h">Checkout bestaetigen</div>
+    <div class="p">Wie viele Darts hast du gebraucht?</div>
+    <div class="actions" style="gap:10px; flex-wrap:wrap">
+      <button class="primary" data-darts="1" style="min-width:90px; padding:14px 16px; font-size:18px; border-radius:14px">1</button>
+      <button class="primary" data-darts="2" style="min-width:90px; padding:14px 16px; font-size:18px; border-radius:14px">2</button>
+      <button class="primary" data-darts="3" style="min-width:90px; padding:14px 16px; font-size:18px; border-radius:14px">3</button>
+      <button class="ghost" id="dartsCancelBtn" style="padding:14px 16px; font-size:16px; border-radius:14px">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+
+<header>
+  <div class="title">
+    <h1>Dartcounter – <span style="color:var(--muted)">501 Double Out</span></h1>
+    <div class="sub">Fixe Spieler: <strong>Shark</strong> vs <strong>Snake</strong> · Satzmodus: <strong>First to 3 Winlegs</strong> · Daten werden lokal gespeichert</div>
+  </div>
+  <div class="topbar">
+    <span class="chip" id="matchInfo">Match: —</span>
+    <button class="danger" id="resetBtn" title="Alles zurücksetzen">Neues Match</button>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+    <section class="card" id="card0">
+      <div class="head">
+        <div class="pname">Shark <span class="badge" id="badge0">—</span></div>
+        <div class="badge" id="setLeg0">Satz 0 · Leg 0</div>
+      </div>
+      <div class="body">
+        <div class="bigscore"><span id="score0">501</span> <small>Rest</small></div>
+
+        <div class="row">
+          <div class="pill"><div class="k">Sätze</div><div class="v big" id="sets0">0</div></div>
+          <div class="pill"><div class="k">Legs (Satz)</div><div class="v big" id="legs0">0</div></div>
+        </div>
+
+        <div class="sep"></div>
+
+        <ul class="miniList">
+          <li class="miniItem"><span class="k">3 Dart Avg</span><span class="v" id="avg0">0.00</span></li>
+          <li class="miniItem"><span class="k">Checkout-Quote</span><span class="v" id="co0">0/0 (0.0%)</span></li>
+          <li class="miniItem"><span class="k">Aufnahmen &lt; 30</span><span class="v" id="u30_0">0</span></li>
+          <li class="miniItem"><span class="k">Aufnahmen ≥ 60</span><span class="v" id="g60_0">0</span></li>
+          <li class="miniItem"><span class="k">Aufnahmen ≥ 80</span><span class="v" id="g80_0">0</span></li>
+          <li class="miniItem"><span class="k">Aufnahmen ≥ 100</span><span class="v" id="g100_0">0</span></li>
+          <li class="miniItem"><span class="k">Aufnahmen ≥ 140</span><span class="v" id="g140_0">0</span></li>
+          <li class="miniItem"><span class="k">Anzahl 180er</span><span class="v" id="d180_0">0</span></li>
+          <li class="miniItem"><span class="k">Höchstes Checkout</span><span class="v" id="hco_0">—</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card" id="card1">
+      <div class="head">
+        <div class="pname">Snake <span class="badge" id="badge1">—</span></div>
+        <div class="badge" id="setLeg1">Satz 0 · Leg 0</div>
+      </div>
+      <div class="body">
+        <div class="bigscore"><span id="score1">501</span> <small>Rest</small></div>
+
+        <div class="row">
+          <div class="pill"><div class="k">Sätze</div><div class="v big" id="sets1">0</div></div>
+          <div class="pill"><div class="k">Legs (Satz)</div><div class="v big" id="legs1">0</div></div>
+        </div>
+
+        <div class="sep"></div>
+
+        <ul class="miniList">
+          <li class="miniItem"><span class="k">3 Dart Avg</span><span class="v" id="avg1">0.00</span></li>
+          <li class="miniItem"><span class="k">Checkout-Quote</span><span class="v" id="co1">0/0 (0.0%)</span></li>
+          <li class="miniItem"><span class="k">Aufnahmen &lt; 30</span><span class="v" id="u30_1">0</span></li>
+          <li class="miniItem"><span class="k">Aufnahmen ≥ 60</span><span class="v" id="g60_1">0</span></li>
+          <li class="miniItem"><span class="k">Aufnahmen ≥ 80</span><span class="v" id="g80_1">0</span></li>
+          <li class="miniItem"><span class="k">Aufnahmen ≥ 100</span><span class="v" id="g100_1">0</span></li>
+          <li class="miniItem"><span class="k">Aufnahmen ≥ 140</span><span class="v" id="g140_1">0</span></li>
+          <li class="miniItem"><span class="k">Anzahl 180er</span><span class="v" id="d180_1">0</span></li>
+          <li class="miniItem"><span class="k">Höchstes Checkout</span><span class="v" id="hco_1">—</span></li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <div class="controls">
+    <section class="panel">
+      <div class="head">Bedienung</div>
+      <div class="body">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between">
+          <div>
+            <div style="font-size:12px; color:var(--muted)">Sätze bis Matchgewinn</div>
+            <div style="margin-top:6px">
+              <input id="setsToWin" type="number" min="1" max="25" step="1" inputmode="numeric"
+                     style="width:160px; background:rgba(0,0,0,.28); border:1px solid var(--line); color:var(--txt); border-radius:12px; padding:10px 10px; font-size:16px; outline:none;">
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap">
+            <button class="primary" id="openEntryBtn" style="padding:14px 16px; font-size:16px; border-radius:14px">Eingabe öffnen</button>
+            <button class="ghost" id="switchBtn">Spieler wechseln</button>
+            <button class="ghost" id="retourBtn">Retour</button>
+          </div>
+        </div>
+
+        <div style="margin-top:10px; color:var(--muted); font-size:13px">
+          Spieler am Zug: <strong id="turnName" style="color:var(--txt)">—</strong> · Satz <strong id="curSet">1</strong> · Leg <strong id="curLeg">1</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="head">Log</div>
+      <div class="body">
+        <div class="log">
+          <table>
+            <thead>
+              <tr>
+                <th>Zeit</th><th>Spieler</th><th>Input</th><th>Effekt</th><th>Rest</th><th>Info</th>
+              </tr>
+            </thead>
+            <tbody id="logBody"></tbody>
+          </table>
+        </div>
+        <div style="color:var(--muted); font-size:12px; margin-top:8px">Tipp: Nach Reload bleibt alles erhalten (localStorage).</div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- ===== Eingabe Modal ===== -->
+<div class="modalOverlay" id="entryOverlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="entryTitle">
+    <div class="modalHead">
+      <div class="modalTitle">
+        <div class="t" id="entryTitle">Aufnahme eingeben</div>
+        <div class="s" id="entrySub">0–180 · Tastatur-Layout · beide Rest-Scores sichtbar</div>
+      </div>
+      <button class="ghost" id="closeEntryBtn" style="padding:14px 16px; font-size:16px; border-radius:14px">Schliessen</button>
+    </div>
+
+    <div class="modalContent">
+      <div class="restBar">
+        <div class="restBox" id="restBox0">
+          <div class="restMeta">
+  	<div class="name">Shark</div>
+ 	 <div class="meta2">
+    	<div>Sätze: <span id="mSets0">0</span></div>
+    	<div>Legs: <span id="mLegs0">0</span></div>
+  	</div>
+   </div>
+          <div class="rest" id="restModal0">501</div>
+        </div>
+        <div class="restBox" id="restBox1">
+          <div class="restMeta">
+  <div class="name">Snake</div>
+  <div class="meta2">
+    <div>Sätze: <span id="mSets1">0</span></div>
+    <div>Legs: <span id="mLegs1">0</span></div>
+  </div>
+</div>
+          <div class="rest" id="restModal1">501</div>
+        </div>
+      </div>
+
+      <div class="typedRow">
+        <div class="typedBig">
+          <div>
+            <div class="k">Spieler am Zug</div>
+            <div style="font-weight:1000; font-size:20px; margin-top:2px" id="turnNameModal">—</div>
+            <div class="k" style="margin-top:8px">Satz <span id="curSetModal">1</span> · Leg <span id="curLegModal">1</span></div>
+          </div>
+          <div style="text-align:right">
+            <div class="k">Eingabe</div>
+            <div class="v" id="typedValue">—</div>
+          </div>
+        </div>
+
+        <div class="checkoutHint" id="checkoutHint" style="display:none">
+          <div class="k">Hinweis</div>
+          <div class="t">Checkout-Chance</div>
+          <div class="list" id="checkoutList"></div>
+        </div>
+      </div>
+
+      <div class="keypadArea">
+        <div class="leftPad">
+          <div class="quickRow" id="quickRow"></div>
+          <div class="pad" id="pad"></div>
+        </div>
+
+        <button class="okBig" id="okBtn">OK</button>
+      </div>
+    </div>
+
+    <div class="modalFoot">
+      <button class="ghost" id="retourBtn2" style="padding:14px 16px; font-size:16px; border-radius:14px">Retour</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Win Popup ===== -->
+<div class="winOverlay" id="winOverlay" aria-hidden="true">
+  <div class="winCard">
+    <div class="h" id="winTitle">LEG SIEG</div>
+    <div class="p" id="winSub">—</div>
+    <div class="who" id="winWho">—</div>
+    <div class="actions">
+      <button class="primary" id="winOkBtn" style="padding:14px 16px; font-size:16px; border-radius:14px">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const LS_KEY = "dartcounter_v5_state";
+  const players = [{ name:"Shark" }, { name:"Snake" }];
+
+  const el = (id) => document.getElementById(id);
+
+  const ui = {
+    matchInfo: el("matchInfo"),
+    resetBtn: el("resetBtn"),
+
+    setsToWin: el("setsToWin"),
+    switchBtn: el("switchBtn"),
+    retourBtn: el("retourBtn"),
+    openEntryBtn: el("openEntryBtn"),
+    turnName: el("turnName"),
+    curSet: el("curSet"),
+    curLeg: el("curLeg"),
+    logBody: el("logBody"),
+
+    card: [el("card0"), el("card1")],
+    badge: [el("badge0"), el("badge1")],
+    setLeg: [el("setLeg0"), el("setLeg1")],
+    score: [el("score0"), el("score1")],
+    sets:  [el("sets0"), el("sets1")],
+    legs:  [el("legs0"), el("legs1")],
+    avg:   [el("avg0"), el("avg1")],
+    co:    [el("co0"), el("co1")],
+    u30:   [el("u30_0"), el("u30_1")],
+    g60:   [el("g60_0"), el("g60_1")],
+    g80:   [el("g80_0"), el("g80_1")],
+    g100:  [el("g100_0"), el("g100_1")],
+    g140:  [el("g140_0"), el("g140_1")],
+    d180:  [el("d180_0"), el("d180_1")],
+    hco:   [el("hco_0"), el("hco_1")],
+
+    entryOverlay: el("entryOverlay"),
+    closeEntryBtn: el("closeEntryBtn"),
+    restBox0: el("restBox0"),
+    restBox1: el("restBox1"),
+    restModal0: el("restModal0"),
+    restModal1: el("restModal1"),
+    turnNameModal: el("turnNameModal"),
+    curSetModal: el("curSetModal"),
+    curLegModal: el("curLegModal"),
+    typedValue: el("typedValue"),
+    mSets: [el("mSets0"), el("mSets1")],
+    mLegs: [el("mLegs0"), el("mLegs1")],
+    quickRow: el("quickRow"),
+    pad: el("pad"),
+    okBtn: el("okBtn"),
+    retourBtn2: el("retourBtn2"),
+
+    checkoutHint: el("checkoutHint"),
+    checkoutList: el("checkoutList"),
+
+    winOverlay: el("winOverlay"),
+    winTitle: el("winTitle"),
+    winSub: el("winSub"),
+    winWho: el("winWho"),
+    winOkBtn: el("winOkBtn"),
+    dartsOverlay: el("dartsOverlay"),
+         dartsCancelBtn: el("dartsCancelBtn"),
+
+  };
+
+  const nowTime = () => {
+    const d = new Date();
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mm = String(d.getMinutes()).padStart(2,"0");
+    const ss = String(d.getSeconds()).padStart(2,"0");
+    return `${hh}:${mm}:${ss}`;
+  };
+
+  const freshPlayerState = () => ({
+    score: 501,
+    sets: 0,
+    legsInSet: 0,
+    totalPoints: 0,
+    totalDarts: 0,
+    checkoutAttempts: 0,
+    checkoutHits: 0,
+    under30: 0,
+    ge60: 0,
+    ge80: 0,
+    ge100: 0,
+    ge140: 0,
+    n180: 0,
+    highestCheckout: null,
+  });
+
+  const freshState = () => ({
+    setsToWin: 3,
+    currentPlayer: 0,
+    currentSetNumber: 1,
+    currentLegNumber: 1,
+    matchOver: false,
+    winner: null,
+    legsToWinSet: 3,
+    players: [freshPlayerState(), freshPlayerState()],
+    history: [],
+    log: [],
+    typed: ""
+  });
+
+  let state = freshState();
+
+  function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+  function load(){
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return;
+    try {
+      const p = JSON.parse(raw);
+      if (p && p.players && p.players.length === 2) state = p;
+    } catch(e){}
+  }
+
+  function fmtPct(n){ return (Math.round(n * 10) / 10).toFixed(1); }
+  function calcAvg(p){ return p.totalDarts > 0 ? (p.totalPoints / p.totalDarts) * 3 : 0; }
+
+  function snapshot(){
+    state.history.push(JSON.stringify({
+      setsToWin: state.setsToWin,
+      currentPlayer: state.currentPlayer,
+      currentSetNumber: state.currentSetNumber,
+      currentLegNumber: state.currentLegNumber,
+      matchOver: state.matchOver,
+      winner: state.winner,
+      legsToWinSet: state.legsToWinSet,
+      players: state.players,
+      log: state.log,
+      typed: state.typed
+    }));
+    if (state.history.length > 80) state.history.shift();
+  }
+
+  function restoreFromHistory(){
+    if (!state.history.length) return;
+    const prev = JSON.parse(state.history.pop());
+    state.setsToWin = prev.setsToWin;
+    state.currentPlayer = prev.currentPlayer;
+    state.currentSetNumber = prev.currentSetNumber;
+    state.currentLegNumber = prev.currentLegNumber;
+    state.matchOver = prev.matchOver;
+    state.winner = prev.winner;
+    state.legsToWinSet = prev.legsToWinSet;
+    state.players = prev.players;
+    state.log = prev.log;
+    state.typed = prev.typed || "";
+    save();
+    updateUI();
+  }
+
+  function pushLog({player, input, effect, rest, info}){
+    state.log.push({ t: nowTime(), player, input, effect, rest, info: info || "" });
+    if (state.log.length > 350) state.log.shift();
+  }
+
+  function nextPlayer(){ state.currentPlayer = state.currentPlayer === 0 ? 1 : 0; }
+
+  function resetLegScores(){
+    state.players[0].score = 501;
+    state.players[1].score = 501;
+  }
+  function resetLegForNewSet(){
+    state.players[0].legsInSet = 0;
+    state.players[1].legsInSet = 0;
+  }
+
+  function showWinPopup(title, sub, who){
+    ui.winTitle.textContent = title;
+    ui.winSub.textContent = sub || "";
+    ui.winWho.textContent = who;
+
+    ui.winOverlay.classList.add("open");
+    ui.winOverlay.setAttribute("aria-hidden","false");
+
+    const t = setTimeout(() => closeWinPopup(), 3000);
+    ui.winOverlay.dataset.timer = String(t);
+  }
+  function closeWinPopup(){
+    const t = Number(ui.winOverlay.dataset.timer || "0");
+    if (t) clearTimeout(t);
+    ui.winOverlay.classList.remove("open");
+    ui.winOverlay.setAttribute("aria-hidden","true");
+    ui.winOverlay.dataset.timer = "";
+  }
+
+  function checkMatchWinner(){
+    for (let i=0;i<2;i++){
+      if (state.players[i].sets >= state.setsToWin){
+        state.matchOver = true;
+        state.winner = i;
+        pushLog({ player: players[i].name, input:"—", effect:"MATCH GEWONNEN", rest:"—", info:`bis ${state.setsToWin} Sätze` });
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function countVisitBucket(p, points){
+    if (points < 30) p.under30++;
+    if (points >= 60) p.ge60++;
+    if (points >= 80) p.ge80++;
+    if (points >= 100) p.ge100++;
+    if (points >= 140) p.ge140++;
+    if (points === 180) p.n180++;
+  }
+
+  function handleCheckoutAttempt(p, startRest){
+    if (startRest <= 170) p.checkoutAttempts++;
+  }
+
+function askCheckoutMeta(){
+  const ok = confirm("Checkout? Bestaetige: Double Out getroffen?");
+  if (!ok) return Promise.resolve({ dartsUsed: 3, doubleOutConfirmed: false });
+
+  // statt prompt: Button-Popup
+  return new Promise((resolve) => {
+    ui.dartsOverlay.classList.add("open");
+    ui.dartsOverlay.setAttribute("aria-hidden","false");
+
+    const cleanup = () => {
+      ui.dartsOverlay.classList.remove("open");
+      ui.dartsOverlay.setAttribute("aria-hidden","true");
+      ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(b => b.onclick = null);
+      ui.dartsCancelBtn.onclick = null;
+    };
+
+    ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(btn => {
+      btn.onclick = () => {
+        const dartsUsed = Number(btn.getAttribute("data-darts")) || 3;
+        cleanup();
+        resolve({ dartsUsed, doubleOutConfirmed: true });
+      };
+    });
+
+    ui.dartsCancelBtn.onclick = () => {
+      cleanup();
+      resolve(null); // entspricht deinem bisherigen "abbrechen"
+    };
+  });
+}
+
+
+  function typedToNumber(){
+    if (!state.typed) return null;
+    const n = Number(state.typed);
+    if (!Number.isFinite(n)) return null;
+    return n;
+  }
+  function clearTyped(){ state.typed = ""; }
+
+  function openEntry(){
+    if (state.matchOver) return;
+    ui.entryOverlay.classList.add("open");
+    ui.entryOverlay.setAttribute("aria-hidden","false");
+    updateUI();
+  }
+  function closeEntry(){
+    ui.entryOverlay.classList.remove("open");
+    ui.entryOverlay.setAttribute("aria-hidden","true");
+  }
+
+  // Standard-Checks (Auswahl). Wichtig: 148 war vorher nicht drin -> jetzt ist er drin.
+  function checkoutSuggestions(rest){
+    const map = {
+      170:["T20 T20 Bull"],
+      167:["T20 T19 Bull"],
+      164:["T20 T18 Bull"],
+      161:["T20 T17 Bull"],
+      160:["T20 T20 D20"],
+      158:["T20 T20 D19"],
+      156:["T20 T20 D18"],
+      153:["T20 T19 D18"],
+      152:["T20 T20 D16"],
+      150:["T20 T18 D18"],
+      148:["T20 T16 D20","T20 T20 D14"],   // <-- neu
+      147:["T20 T17 D18"],
+      146:["T20 T18 D16"],
+      145:["T20 T15 D20"],
+      144:["T20 T20 D12"],
+      141:["T20 T19 D12"],
+      140:["T20 T20 D10"],
+      138:["T20 T18 D12"],
+      137:["T20 T19 D10"],
+      136:["T20 T20 D8"],
+      135:["T20 T17 D12"],
+      132:["T20 T20 D6"],
+      130:["T20 T20 D5"],
+      128:["T18 T18 D10"],
+      127:["T20 T17 D8"],
+      124:["T20 T16 D8"],
+      121:["T20 T11 D14"],
+      120:["T20 20 D20"],
+      116:["T20 16 D20"],
+      112:["T20 20 D16"],
+      110:["T20 10 D20"],
+      107:["T19 18 D16"],
+      104:["T18 18 D16"],
+      100:["T20 D20","S20 D20"],
+      98:["T20 D19"],
+      96:["T20 D18"],
+      95:["T19 D19"],
+      94:["T18 D20"],
+      92:["T20 D16"],
+      90:["T18 D18"],
+      88:["T16 D20"],
+      85:["T15 D20"],
+      81:["T19 D12"],
+      80:["T20 D10","S20 D20"],
+      76:["T20 D8"],
+      72:["T20 D6"],
+      70:["T18 D8"],
+      65:["S25 D20"],
+      60:["20 D20"],
+      50:["Bull"],
+      40:["D20"],
+      32:["D16"]
+    };
+    return map[rest] || [];
+  }
+
+  function updateCheckoutHint(){
+    const i = state.currentPlayer;
+    const rest = state.players[i].score;
+
+    if (rest <= 170 && rest >= 2){
+      const sug = checkoutSuggestions(rest).slice(0,3);
+      ui.checkoutHint.style.display = "flex";
+      ui.checkoutList.innerHTML = "";
+
+      // Wenn keine Route hinterlegt: trotzdem Hinweis, aber ohne Verwirrung
+      if (sug.length){
+        sug.forEach(s => {
+          const span = document.createElement("span");
+          span.className = "tag";
+          span.textContent = s;
+          ui.checkoutList.appendChild(span);
+        });
+      } else {
+        const span = document.createElement("span");
+        span.className = "tag";
+        span.textContent = "keine Standardroute";
+        ui.checkoutList.appendChild(span);
+      }
+    } else {
+      ui.checkoutHint.style.display = "none";
+      ui.checkoutList.innerHTML = "";
+    }
+  }
+
+  function appendDigit(d){
+    if (state.matchOver) return;
+    if (state.typed === "0") state.typed = "";
+    const next = (state.typed || "") + String(d);
+    const val = Number(next);
+    if (!Number.isFinite(val)) return;
+    if (val > 180) return;
+    state.typed = next;
+    save(); updateUI();
+  }
+
+  function backspace(){
+    if (state.matchOver) return;
+    state.typed = (state.typed || "").slice(0,-1);
+    save(); updateUI();
+  }
+
+  function clearAll(){
+    if (state.matchOver) return;
+    snapshot();
+    clearTyped();
+    save(); updateUI();
+  }
+
+  async function bookVisit(){
+  if (state.matchOver) return;
+
+  const setsToWin = Number(ui.setsToWin.value);
+  if (Number.isFinite(setsToWin) && setsToWin >= 1) state.setsToWin = Math.floor(setsToWin);
+
+  let v = typedToNumber();
+  if (v === null) v = 0;
+  v = Math.max(0, Math.min(180, Math.floor(v)));
+
+  const i = state.currentPlayer;
+  const p = state.players[i];
+  const startRest = p.score;
+
+  snapshot();
+  handleCheckoutAttempt(p, startRest);
+
+  let dartsThisVisit = 3;
+  let newRest = startRest - v;
+
+  // Bust-Regeln
+  if (newRest < 0 || newRest === 1){
+    newRest = startRest;
+    countVisitBucket(p, 0);
+    p.totalDarts += dartsThisVisit;
+
+    pushLog({ player: players[i].name, input:String(v), effect:"0", rest:String(newRest), info:"Bust" });
+
+    clearTyped();
+    nextPlayer();
+    save(); updateUI();
+    return;
+  }
+
+  // Checkout
+  if (newRest === 0){
+    const meta = await askCheckoutMeta();
+    if (meta === null){
+      restoreFromHistory();
+      return;
+    }
+
+    if (!meta.doubleOutConfirmed){
+      newRest = startRest;
+      countVisitBucket(p, 0);
+      p.totalDarts += 3;
+
+      pushLog({
+        player: players[i].name,
+        input: String(v),
+        effect: "0",
+        rest: String(newRest),
+        info: "Checkout nicht bestaetigt (Bust)"
+      });
+
+      clearTyped();
+      nextPlayer();
+      save(); updateUI();
+      return;
+    }
+
+    dartsThisVisit = meta.dartsUsed;
+
+    countVisitBucket(p, v);
+    p.totalPoints += v;
+    p.totalDarts += dartsThisVisit;
+
+    p.checkoutHits++;
+
+    const coVal = startRest;
+    if (p.highestCheckout == null || coVal > p.highestCheckout){
+      p.highestCheckout = coVal;
+    }
+
+    p.legsInSet += 1;
+
+    pushLog({
+      player: players[i].name,
+      input: String(v),
+      effect: `Checkout (${coVal})`,
+      rest: "0",
+      info: `${dartsThisVisit} Dart(s)`
+    });
+
+    showWinPopup("LEG SIEG", `Satz ${state.currentSetNumber} · Leg ${state.currentLegNumber}`, players[i].name);
+
+    if (p.legsInSet >= state.legsToWinSet){
+      p.sets += 1;
+
+      pushLog({
+        player: players[i].name,
+        input: "—",
+        effect: "SATZ GEWONNEN",
+        rest: "—",
+        info: `Legs ${state.legsToWinSet}:0`
+      });
+
+      showWinPopup("SATZ SIEG", `Satz ${state.currentSetNumber} abgeschlossen`, players[i].name);
+
+      state.currentSetNumber += 1;
+      state.currentLegNumber = 1;
+
+      resetLegForNewSet();
+      resetLegScores();
+
+      state.currentPlayer = i;
+      clearTyped();
+
+      if (checkMatchWinner()){
+        save(); updateUI();
+        return;
+      }
+    } else {
+      state.currentLegNumber += 1;
+      resetLegScores();
+      state.currentPlayer = i;
+      clearTyped();
+    }
+
+    save(); updateUI();
+    return;
+  }
+
+  // Normaler Wurf (kein Bust, kein Checkout)
+  countVisitBucket(p, v);
+  p.totalPoints += v;
+  p.totalDarts += dartsThisVisit;
+  p.score = newRest;
+
+  pushLog({ player: players[i].name, input:String(v), effect:`-${v}`, rest:String(newRest), info:"" });
+
+  clearTyped();
+  nextPlayer();
+  save(); updateUI();
+}
+
+  function switchPlayerManual(){
+    if (state.matchOver) return;
+    snapshot();
+    nextPlayer();
+    pushLog({ player: players[state.currentPlayer].name, input:"—", effect:"Spieler gewechselt", rest:"—", info:"manuell" });
+    clearTyped();
+    save(); updateUI();
+  }
+
+  function resetMatch(){
+    if (!confirm("Wirklich neues Match starten? Alle Daten werden geloescht.")) return;
+    const keep = Number(ui.setsToWin.value) || 3;
+    state = freshState();
+    state.setsToWin = keep;
+    save(); updateUI();
+  }
+
+  function renderKeypads(){
+    // Quickbuttons
+    const quick = [26,41,45,60,81,85,100];
+    ui.quickRow.innerHTML = "";
+    quick.forEach(v => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = String(v);
+      b.addEventListener("click", () => {
+        if (state.matchOver) return;
+        state.typed = String(v);
+        save(); updateUI();
+      });
+      ui.quickRow.appendChild(b);
+    });
+
+    // Pad: 1..9, dann unten: (Loeschen letzte) (0) (Loeschen)
+    ui.pad.innerHTML = "";
+
+    const mkNum = (n) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = String(n);
+      b.addEventListener("click", () => appendDigit(n));
+      return b;
+    };
+
+    [1,2,3,4,5,6,7,8,9].forEach(n => ui.pad.appendChild(mkNum(n)));
+
+    // Bottom-left: Backspace with text
+    const back = document.createElement("button");
+    back.type = "button";
+    back.className = "action";
+    back.textContent = "Letzte Zahl loeschen";
+    back.addEventListener("click", backspace);
+    ui.pad.appendChild(back);
+
+    // Bottom-middle: 0
+    ui.pad.appendChild(mkNum(0));
+
+    // Bottom-right: Clear -> Loeschen
+    const clr = document.createElement("button");
+    clr.type = "button";
+    clr.className = "action";
+    clr.textContent = "Loeschen";
+    clr.addEventListener("click", clearAll);
+    ui.pad.appendChild(clr);
+  }
+
+  function updateTurnHighlight(){
+    for (let i=0;i<2;i++){
+      ui.card[i].classList.toggle("turn", !state.matchOver && state.currentPlayer === i);
+
+      const b = ui.badge[i];
+      b.classList.remove("turn","winner");
+      if (state.matchOver && state.winner === i){
+        b.textContent = "Winner";
+        b.classList.add("winner");
+      } else if (!state.matchOver && state.currentPlayer === i){
+        b.textContent = "Am Zug";
+        b.classList.add("turn");
+      } else {
+        b.textContent = "—";
+      }
+    }
+    ui.restBox0.classList.toggle("turn", !state.matchOver && state.currentPlayer === 0);
+    ui.restBox1.classList.toggle("turn", !state.matchOver && state.currentPlayer === 1);
+  }
+
+  function updateUI(){
+    ui.setsToWin.value = state.setsToWin;
+
+    ui.turnName.textContent = players[state.currentPlayer].name;
+    ui.curSet.textContent = state.currentSetNumber;
+    ui.curLeg.textContent = state.currentLegNumber;
+
+    ui.matchInfo.textContent = `Match bis ${state.setsToWin} Sätze · Satzmodus: First to ${state.legsToWinSet} Winlegs · 501 Double Out`;
+
+    for (let i=0;i<2;i++){
+      const p = state.players[i];
+
+      ui.score[i].textContent = p.score;
+      ui.sets[i].textContent  = p.sets;
+      ui.legs[i].textContent  = p.legsInSet;
+
+      ui.avg[i].textContent = calcAvg(p).toFixed(2);
+
+      const att = p.checkoutAttempts;
+      const hit = p.checkoutHits;
+      const pct = att ? (hit/att*100) : 0;
+      ui.co[i].textContent = `${hit}/${att} (${fmtPct(pct)}%)`;
+
+      ui.u30[i].textContent  = p.under30;
+      ui.g60[i].textContent  = p.ge60;
+      ui.g80[i].textContent  = p.ge80;
+      ui.g100[i].textContent = p.ge100;
+      ui.g140[i].textContent = p.ge140;
+      ui.d180[i].textContent = p.n180;
+      ui.hco[i].textContent  = p.highestCheckout == null ? "—" : String(p.highestCheckout);
+
+      ui.setLeg[i].textContent = `Satz ${state.currentSetNumber} · Leg ${state.currentLegNumber}`;
+    }
+
+    ui.logBody.innerHTML = state.log.slice().reverse().map(r => `
+      <tr>
+        <td style="color:var(--muted)">${r.t}</td>
+        <td>${r.player}</td>
+        <td>${r.input}</td>
+        <td>${r.effect}</td>
+        <td>${r.rest}</td>
+        <td style="color:var(--muted)">${r.info || ""}</td>
+      </tr>
+    `).join("");
+
+    // modal
+    ui.restModal0.textContent = state.players[0].score;
+    ui.restModal1.textContent = state.players[1].score;
+    ui.turnNameModal.textContent = players[state.currentPlayer].name;
+    ui.curSetModal.textContent = state.currentSetNumber;
+    ui.curLegModal.textContent = state.currentLegNumber;
+    ui.typedValue.textContent = state.typed ? state.typed : "—";
+    // modal: Saetze/Legs pro Spieler
+ui.mSets[0].textContent = state.players[0].sets;
+ui.mSets[1].textContent = state.players[1].sets;
+ui.mLegs[0].textContent = state.players[0].legsInSet;
+ui.mLegs[1].textContent = state.players[1].legsInSet;
+
+    updateCheckoutHint();
+    updateTurnHighlight();
+  }
+
+  // events
+  ui.resetBtn.addEventListener("click", resetMatch);
+  ui.switchBtn.addEventListener("click", switchPlayerManual);
+  ui.retourBtn.addEventListener("click", restoreFromHistory);
+
+  ui.openEntryBtn.addEventListener("click", openEntry);
+  ui.closeEntryBtn.addEventListener("click", closeEntry);
+  ui.entryOverlay.addEventListener("click", (e) => { if (e.target === ui.entryOverlay) closeEntry(); });
+
+  ui.okBtn.addEventListener("click", bookVisit);
+  ui.retourBtn2.addEventListener("click", restoreFromHistory);
+
+  ui.winOkBtn.addEventListener("click", () => closeWinPopup());
+  ui.winOverlay.addEventListener("click", (e) => { if (e.target === ui.winOverlay) closeWinPopup(); });
+
+  ui.setsToWin.addEventListener("change", () => {
+    const v = Number(ui.setsToWin.value);
+    if (Number.isFinite(v) && v >= 1){
+      state.setsToWin = Math.floor(v);
+      save(); updateUI();
+    }
+  });
+
+  // init
+  load();
+  if (!Number.isFinite(state.setsToWin) || state.setsToWin < 1) state.setsToWin = 3;
+  renderKeypads();
+  updateUI();
+})();
+</script>
+</body>
+</html>
