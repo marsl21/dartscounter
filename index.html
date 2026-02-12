@@ -11,8 +11,8 @@
       --muted:#9fb0c7;
       --line:#223246;
 
-      --acc:#36f1a6;
-      --good:#40c9ff;
+      --acc:#36f1a6;   /* Shark */
+      --good:#40c9ff;  /* Snake */
       --bad:#ff4d6d;
       --warn:#ffcc66;
 
@@ -21,8 +21,6 @@
 
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-
-      --turnGlow: 0 0 0 2px rgba(54,241,166,.38), 0 0 26px rgba(54,241,166,.22), 0 18px 50px rgba(0,0,0,.40);
     }
 
     *{box-sizing:border-box}
@@ -68,19 +66,19 @@
       transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
     }
 
-    /* fixe Player-Farben */
+    /* fixe Player-Farben (Hauptkarten) */
     #card0{ border-color: rgba(54,241,166,.70); }   /* Shark gruen */
     #card1{ border-color: rgba(64,201,255,.70); }   /* Snake hellblau */
 
-    /* Turn-Glow pro Player */
+    /* Turn-Glow pro Player (nur wenn am Zug) */
     .card.turn0{
-      border-color: rgba(54,241,166,.90);
-      box-shadow: 0 0 0 2px rgba(54,241,166,.38), 0 0 26px rgba(54,241,166,.22), 0 18px 50px rgba(0,0,0,.40);
+      border-color: rgba(54,241,166,.92);
+      box-shadow: 0 0 0 2px rgba(54,241,166,.40), 0 0 32px rgba(54,241,166,.25), 0 18px 50px rgba(0,0,0,.40);
       transform: translateY(-1px);
     }
     .card.turn1{
-      border-color: rgba(64,201,255,.90);
-      box-shadow: 0 0 0 2px rgba(64,201,255,.38), 0 0 26px rgba(64,201,255,.22), 0 18px 50px rgba(0,0,0,.40);
+      border-color: rgba(64,201,255,.92);
+      box-shadow: 0 0 0 2px rgba(64,201,255,.40), 0 0 32px rgba(64,201,255,.25), 0 18px 50px rgba(0,0,0,.40);
       transform: translateY(-1px);
     }
 
@@ -255,57 +253,76 @@
     @media (max-width: 520px){ .restBar{grid-template-columns:1fr} }
 
     .restBox{
-      border:1px solid rgba(34,50,70,.9);
+      border:1px solid rgba(34,50,70,.9);          /* neutral */
       background: rgba(0,0,0,.22);
       border-radius:18px;
       padding:14px 14px;
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
     }
 
-    /* fixe Umrandung auch im Modal */
-    #restBox0{ border-color: rgba(54,241,166,.65); }
-    #restBox1{ border-color: rgba(64,201,255,.65); }
-
+    /* WICHTIG: im Popup soll nur leuchten, wenn am Zug -> nur turn0/turn1 haben Farbe */
     .restBox.turn0{
-      border-color: rgba(54,241,166,.85);
-      box-shadow: 0 0 0 2px rgba(54,241,166,.38), 0 0 26px rgba(54,241,166,.22), 0 18px 50px rgba(0,0,0,.40);
+      border-color: rgba(54,241,166,.90);
+      box-shadow: 0 0 0 2px rgba(54,241,166,.42), 0 0 34px rgba(54,241,166,.28), 0 18px 50px rgba(0,0,0,.40);
     }
     .restBox.turn1{
-      border-color: rgba(64,201,255,.85);
-      box-shadow: 0 0 0 2px rgba(64,201,255,.38), 0 0 26px rgba(64,201,255,.22), 0 18px 50px rgba(0,0,0,.40);
+      border-color: rgba(64,201,255,.90);
+      box-shadow: 0 0 0 2px rgba(64,201,255,.42), 0 0 34px rgba(64,201,255,.28), 0 18px 50px rgba(0,0,0,.40);
     }
 
-    .restBox .name{
-      font-weight:1000;
-      font-size:24px;
-      line-height:1.1;
-    }
-
-    .meta2{
-      color: var(--muted);
-      font-size:15px;
-      display:flex;
-      flex-direction:column;
-      gap:3px;
-    }
-
-    .meta2 span{
-      color: var(--txt);
-      font-weight:900;
-    }
-
-    .restBox .rest{
-      font-size:64px;
-      font-weight:1000;
-      font-variant-numeric: tabular-nums;
-      font-feature-settings: "zero" 0;
-    }
-    .restBox .muted{color:var(--muted); font-size:12px; margin-top:2px}
+    /* Name + Saetze/Legs rechts daneben, deutlich groesser */
     .restMeta{
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:8px;
       align-items:flex-start;
+      min-width: 0;
+    }
+    .nameRow{
+      display:flex;
+      align-items:baseline;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .nameRow .name{
+      font-weight:1000;
+      font-size:32px;
+      line-height:1.05;
+      letter-spacing:.2px;
+      white-space:nowrap;
+    }
+    .nameRow .stats{
+      display:flex;
+      align-items:baseline;
+      gap:10px;
+      font-weight:1000;
+      font-variant-numeric: tabular-nums;
+      font-family: var(--mono);
+      font-size:22px;
+      padding:6px 10px;
+      border-radius:14px;
+      border:1px solid rgba(34,50,70,.85);
+      background: rgba(0,0,0,.18);
+      white-space:nowrap;
+    }
+    .nameRow .stats .lab{
+      color: var(--muted);
+      font-weight:900;
+      font-family: var(--sans);
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .nameRow .stats b{
+      color: var(--txt);
+      font-weight:1000;
+      font-size:24px;
+    }
+
+    .restBox .rest{
+      font-size:72px;
+      font-weight:1000;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "zero" 0;
     }
 
     .typedRow{
@@ -357,7 +374,7 @@
       font-size:13px;
     }
 
-    /* keypad area: links schmalere Tasten, rechts grosser OK */
+    /* keypad area */
     .keypadArea{
       margin-top:14px;
       display:grid;
@@ -384,9 +401,9 @@
       .quickRow{grid-template-columns: repeat(4, 1fr);}
     }
     .quickRow button{
-      padding:20px 8px;      /* hoeher */
+      padding:20px 8px;
       border-radius:18px;
-      font-size:20px;        /* Zahl groesser */
+      font-size:20px;
       font-weight:1000;
       font-family: var(--mono);
       border-color: rgba(64,201,255,.62);
@@ -394,16 +411,15 @@
       color: var(--good);
     }
 
-    /* 1-9 + bottom row (Backspace / 0 / Loeschen) */
     .pad{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
       gap:12px;
     }
     .pad button{
-      padding:30px 10px;         /* deutlich hoeher */
+      padding:30px 10px;
       border-radius:20px;
-      font-size:30px;            /* Zahl groesser */
+      font-size:30px;
       font-weight:1000;
       font-family: var(--mono);
       background: rgba(255,255,255,.06);
@@ -423,7 +439,7 @@
       height:100%;
       width:100%;
       border-radius:20px;
-      font-size:30px; /* groesser */
+      font-size:30px;
       font-weight:1000;
       border-color: rgba(54,241,166,.80);
       background: rgba(54,241,166,.16);
@@ -436,31 +452,47 @@
       display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;
     }
 
-    /* ===== Win Popup ===== */
+    /* ===== Win Popup (knallt) ===== */
     .winOverlay{
       position:fixed; inset:0;
       display:none;
       align-items:center; justify-content:center;
-      background: rgba(0,0,0,.70);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       z-index: 60;
       padding:16px;
     }
     .winOverlay.open{display:flex}
-    .winCard{
-      width:min(520px, 100%);
-      border-radius:22px;
-      border:1px solid rgba(34,50,70,.9);
-      background: linear-gradient(180deg, rgba(17,24,36,.98), rgba(10,14,20,.98));
-      box-shadow: 0 30px 90px rgba(0,0,0,.55);
-      padding:18px 16px;
-      text-align:center;
+
+    @keyframes popIn {
+      0%   { transform: scale(.70); opacity: 0; }
+      55%  { transform: scale(1.06); opacity: 1; }
+      100% { transform: scale(1); }
     }
-    .winCard .h{font-size:28px; font-weight:1000; letter-spacing:.2px}
-    .winCard .p{margin-top:8px; color:var(--muted); font-size:14px}
-    .winCard .who{margin-top:10px; font-size:34px; font-weight:1000; color: var(--good)}
-    .winCard .actions{margin-top:14px; display:flex; justify-content:center}
+    @keyframes glowPulse {
+      0%,100% { box-shadow: 0 0 0 2px rgba(64,201,255,.25), 0 0 34px rgba(64,201,255,.20), 0 24px 80px rgba(0,0,0,.55); }
+      50%     { box-shadow: 0 0 0 2px rgba(54,241,166,.25), 0 0 44px rgba(54,241,166,.22), 0 24px 80px rgba(0,0,0,.55); }
+    }
+
+    .winCard{
+      width:min(860px, 98%);
+      border-radius:26px;
+      border:1px solid rgba(34,50,70,.95);
+      background: linear-gradient(180deg, rgba(17,24,36,.98), rgba(10,14,20,.98));
+      padding:32px 26px;
+      text-align:center;
+      animation: popIn .28s ease-out both, glowPulse 1.6s ease-in-out infinite;
+    }
+    .winCard .h{font-size:46px; font-weight:1000; letter-spacing:.4px}
+    .winCard .p{margin-top:10px; color:var(--muted); font-size:18px}
+    .winCard .who{margin-top:16px; font-size:64px; font-weight:1000; color: var(--good); letter-spacing:.4px}
+    .winCard .actions{margin-top:18px; display:flex; justify-content:center}
+
+    /* Checkout-Darts Overlay nutzt winCard ebenfalls -> etwas kleiner, aber immer noch gross */
+    #dartsOverlay .winCard{ width:min(720px, 98%); padding:28px 24px; animation: popIn .28s ease-out both; box-shadow: 0 30px 90px rgba(0,0,0,.60); }
+    #dartsOverlay .winCard .h{ font-size:36px; }
+    #dartsOverlay .winCard .p{ font-size:18px; }
   </style>
 </head>
 <body>
@@ -470,11 +502,11 @@
   <div class="winCard">
     <div class="h">Checkout bestaetigen</div>
     <div class="p">Wie viele Darts hast du gebraucht?</div>
-    <div class="actions" style="gap:10px; flex-wrap:wrap">
-      <button class="primary" data-darts="1" style="min-width:90px; padding:14px 16px; font-size:18px; border-radius:14px">1</button>
-      <button class="primary" data-darts="2" style="min-width:90px; padding:14px 16px; font-size:18px; border-radius:14px">2</button>
-      <button class="primary" data-darts="3" style="min-width:90px; padding:14px 16px; font-size:18px; border-radius:14px">3</button>
-      <button class="ghost" id="dartsCancelBtn" style="padding:14px 16px; font-size:16px; border-radius:14px">Abbrechen</button>
+    <div class="actions" style="gap:12px; flex-wrap:wrap">
+      <button class="primary" data-darts="1" style="min-width:110px; padding:16px 18px; font-size:22px; border-radius:16px">1</button>
+      <button class="primary" data-darts="2" style="min-width:110px; padding:16px 18px; font-size:22px; border-radius:16px">2</button>
+      <button class="primary" data-darts="3" style="min-width:110px; padding:16px 18px; font-size:22px; border-radius:16px">3</button>
+      <button class="ghost" id="dartsCancelBtn" style="padding:16px 18px; font-size:18px; border-radius:16px">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -610,20 +642,25 @@
       <div class="restBar">
         <div class="restBox" id="restBox0">
           <div class="restMeta">
-            <div class="name">Shark</div>
-            <div class="meta2">
-              <div>Saetze: <span id="mSets0">0</span></div>
-              <div>Legs: <span id="mLegs0">0</span></div>
+            <div class="nameRow">
+              <div class="name">Shark</div>
+              <div class="stats" aria-label="Saetze und Legs">
+                <span class="lab">S</span><b id="mSets0">0</b>
+                <span class="lab">L</span><b id="mLegs0">0</b>
+              </div>
             </div>
           </div>
           <div class="rest" id="restModal0">501</div>
         </div>
+
         <div class="restBox" id="restBox1">
           <div class="restMeta">
-            <div class="name">Snake</div>
-            <div class="meta2">
-              <div>Saetze: <span id="mSets1">0</span></div>
-              <div>Legs: <span id="mLegs1">0</span></div>
+            <div class="nameRow">
+              <div class="name">Snake</div>
+              <div class="stats" aria-label="Saetze und Legs">
+                <span class="lab">S</span><b id="mSets1">0</b>
+                <span class="lab">L</span><b id="mLegs1">0</b>
+              </div>
             </div>
           </div>
           <div class="rest" id="restModal1">501</div>
@@ -634,7 +671,7 @@
         <div class="typedBig">
           <div>
             <div class="k">Spieler am Zug</div>
-            <div style="font-weight:1000; font-size:20px; margin-top:2px" id="turnNameModal">—</div>
+            <div style="font-weight:1000; font-size:22px; margin-top:2px" id="turnNameModal">—</div>
             <div class="k" style="margin-top:8px">Satz <span id="curSetModal">1</span> · Leg <span id="curLegModal">1</span></div>
           </div>
           <div style="text-align:right">
@@ -673,7 +710,7 @@
     <div class="p" id="winSub">—</div>
     <div class="who" id="winWho">—</div>
     <div class="actions">
-      <button class="primary" id="winOkBtn" style="padding:14px 16px; font-size:16px; border-radius:14px">OK</button>
+      <button class="primary" id="winOkBtn" style="padding:18px 22px; font-size:20px; border-radius:18px">OK</button>
     </div>
   </div>
 </div>
@@ -769,7 +806,6 @@
     highestCheckout: null,
   });
 
-  // Leg-Starter: beginnt Leg 1 -> Player 0; danach immer wechselnd
   const freshState = () => ({
     setsToWin: 3,
 
@@ -798,11 +834,9 @@
       const p = JSON.parse(raw);
       if (p && p.players && p.players.length === 2) state = p;
 
-      // Abwaertskompatibel: falls alte States ohne legStarter existieren
       if (state.legStarter === undefined || state.legStarter === null) state.legStarter = 0;
       if (state.nextLegStarter === undefined || state.nextLegStarter === null) state.nextLegStarter = state.legStarter === 0 ? 1 : 0;
       if (state.currentPlayer === undefined || state.currentPlayer === null) state.currentPlayer = state.legStarter;
-
     } catch(e){}
   }
 
@@ -812,10 +846,8 @@
   function snapshot(){
     state.history.push(JSON.stringify({
       setsToWin: state.setsToWin,
-
       legStarter: state.legStarter,
       nextLegStarter: state.nextLegStarter,
-
       currentPlayer: state.currentPlayer,
       currentSetNumber: state.currentSetNumber,
       currentLegNumber: state.currentLegNumber,
@@ -1069,7 +1101,6 @@
     save(); updateUI();
   }
 
-  // Anwurf fuer naechstes Leg umschalten
   function advanceLegStarter(){
     state.legStarter = state.nextLegStarter;
     state.nextLegStarter = state.legStarter === 0 ? 1 : 0;
@@ -1096,7 +1127,6 @@
     let dartsThisVisit = 3;
     let newRest = startRest - v;
 
-    // Bust-Regeln
     if (newRest < 0 || newRest === 1){
       newRest = startRest;
       countVisitBucket(p, 0);
@@ -1110,7 +1140,6 @@
       return;
     }
 
-    // Checkout
     if (newRest === 0){
       const meta = await askCheckoutMeta();
       if (meta === null){
@@ -1162,7 +1191,6 @@
 
       showWinPopup("LEG SIEG", `Satz ${state.currentSetNumber} · Leg ${state.currentLegNumber}`, players[i].name);
 
-      // Satz gewonnen?
       if (p.legsInSet >= state.legsToWinSet){
         p.sets += 1;
 
@@ -1182,7 +1210,6 @@
         resetLegForNewSet();
         resetLegScores();
 
-        // Anwurf wechselt nach jedem Leg (auch nach Satz)
         advanceLegStarter();
         clearTyped();
 
@@ -1191,11 +1218,9 @@
           return;
         }
       } else {
-        // Naechstes Leg im selben Satz
         state.currentLegNumber += 1;
         resetLegScores();
 
-        // Anwurf wechselt nach jedem Leg
         advanceLegStarter();
         clearTyped();
       }
@@ -1204,7 +1229,6 @@
       return;
     }
 
-    // Normaler Wurf
     countVisitBucket(p, v);
     p.totalPoints += v;
     p.totalDarts += dartsThisVisit;
@@ -1298,8 +1322,9 @@
       }
     }
 
-    ui.restBox0.classList.remove("turn","turn0","turn1");
-    ui.restBox1.classList.remove("turn","turn0","turn1");
+    /* Popup: nur am Zug leuchten */
+    ui.restBox0.classList.remove("turn0","turn1");
+    ui.restBox1.classList.remove("turn0","turn1");
     if (!state.matchOver && state.currentPlayer === 0) ui.restBox0.classList.add("turn0");
     if (!state.matchOver && state.currentPlayer === 1) ui.restBox1.classList.add("turn1");
   }
@@ -1365,7 +1390,6 @@
     updateTurnHighlight();
   }
 
-  // events
   ui.resetBtn.addEventListener("click", resetMatch);
   ui.switchBtn.addEventListener("click", switchPlayerManual);
   ui.retourBtn.addEventListener("click", restoreFromHistory);
@@ -1388,11 +1412,9 @@
     }
   });
 
-  // init
   load();
   if (!Number.isFinite(state.setsToWin) || state.setsToWin < 1) state.setsToWin = 3;
 
-  // Sicherstellen: currentPlayer passt zum aktuellen Leg-Starter
   if (state.legStarter === undefined || state.legStarter === null) state.legStarter = 0;
   if (state.nextLegStarter === undefined || state.nextLegStarter === null) state.nextLegStarter = state.legStarter === 0 ? 1 : 0;
   if (state.currentPlayer === undefined || state.currentPlayer === null) state.currentPlayer = state.legStarter;
