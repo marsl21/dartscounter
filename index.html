@@ -67,9 +67,20 @@
       overflow:hidden;
       transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
     }
-    .card.turn{
-      border-color: rgba(54,241,166,.68);
-      box-shadow: var(--turnGlow);
+
+    /* fixe Player-Farben */
+    #card0{ border-color: rgba(54,241,166,.70); }   /* Shark gruen */
+    #card1{ border-color: rgba(64,201,255,.70); }   /* Snake hellblau */
+
+    /* Turn-Glow pro Player */
+    .card.turn0{
+      border-color: rgba(54,241,166,.90);
+      box-shadow: 0 0 0 2px rgba(54,241,166,.38), 0 0 26px rgba(54,241,166,.22), 0 18px 50px rgba(0,0,0,.40);
+      transform: translateY(-1px);
+    }
+    .card.turn1{
+      border-color: rgba(64,201,255,.90);
+      box-shadow: 0 0 0 2px rgba(64,201,255,.38), 0 0 26px rgba(64,201,255,.22), 0 18px 50px rgba(0,0,0,.40);
       transform: translateY(-1px);
     }
 
@@ -79,9 +90,9 @@
       background: rgba(255,255,255,.03);
       display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
     }
-    .pname{font-size:18px; font-weight:900; letter-spacing:.2px; display:flex; align-items:center; gap:10px}
+    .pname{font-size:22px; font-weight:900; letter-spacing:.2px; display:flex; align-items:center; gap:10px}
     .badge{
-      font-size:12px; padding:5px 10px; border-radius:999px;
+      font-size:14px; padding:6px 12px; border-radius:999px;
       border:1px solid var(--line); color:var(--muted);
       background: rgba(0,0,0,.25);
     }
@@ -250,43 +261,52 @@
       padding:14px 14px;
       display:flex; align-items:center; justify-content:space-between; gap:10px;
     }
-    .restBox.turn{
-      border-color: rgba(54,241,166,.75);
-      box-shadow: var(--turnGlow);
+
+    /* fixe Umrandung auch im Modal */
+    #restBox0{ border-color: rgba(54,241,166,.65); }
+    #restBox1{ border-color: rgba(64,201,255,.65); }
+
+    .restBox.turn0{
+      border-color: rgba(54,241,166,.85);
+      box-shadow: 0 0 0 2px rgba(54,241,166,.38), 0 0 26px rgba(54,241,166,.22), 0 18px 50px rgba(0,0,0,.40);
     }
+    .restBox.turn1{
+      border-color: rgba(64,201,255,.85);
+      box-shadow: 0 0 0 2px rgba(64,201,255,.38), 0 0 26px rgba(64,201,255,.22), 0 18px 50px rgba(0,0,0,.40);
+    }
+
     .restBox .name{
-  font-weight:1000;
-  font-size:20px;
-  line-height:1.1;
-}
+      font-weight:1000;
+      font-size:24px;
+      line-height:1.1;
+    }
 
-.meta2{
-  color: var(--muted);
-  font-size:13px;
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
+    .meta2{
+      color: var(--muted);
+      font-size:15px;
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
 
-.meta2 span{
-  color: var(--txt);
-  font-weight:900;
-}
+    .meta2 span{
+      color: var(--txt);
+      font-weight:900;
+    }
 
     .restBox .rest{
-      font-size:56px;
+      font-size:64px;
       font-weight:1000;
       font-variant-numeric: tabular-nums;
       font-feature-settings: "zero" 0;
     }
     .restBox .muted{color:var(--muted); font-size:12px; margin-top:2px}
     .restMeta{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  align-items:flex-start;
-}
-
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      align-items:flex-start;
+    }
 
     .typedRow{
       margin-top:12px;
@@ -364,9 +384,9 @@
       .quickRow{grid-template-columns: repeat(4, 1fr);}
     }
     .quickRow button{
-      padding:14px 8px;
-      border-radius:16px;
-      font-size:16px;
+      padding:20px 8px;      /* hoeher */
+      border-radius:18px;
+      font-size:20px;        /* Zahl groesser */
       font-weight:1000;
       font-family: var(--mono);
       border-color: rgba(64,201,255,.62);
@@ -381,9 +401,9 @@
       gap:12px;
     }
     .pad button{
-      padding:18px 10px;         /* weniger breit/hoch */
-      border-radius:18px;
-      font-size:22px;
+      padding:30px 10px;         /* deutlich hoeher */
+      border-radius:20px;
+      font-size:30px;            /* Zahl groesser */
       font-weight:1000;
       font-family: var(--mono);
       background: rgba(255,255,255,.06);
@@ -403,7 +423,7 @@
       height:100%;
       width:100%;
       border-radius:20px;
-      font-size:26px;
+      font-size:30px; /* groesser */
       font-weight:1000;
       border-color: rgba(54,241,166,.80);
       background: rgba(54,241,166,.16);
@@ -417,31 +437,30 @@
     }
 
     /* ===== Win Popup ===== */
-    
-.winOverlay{
-  position:fixed; inset:0;
-  display:none;
-  align-items:center; justify-content:center;
-  background: rgba(0,0,0,.70);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  z-index: 60;
-  padding:16px;
-}
-.winOverlay.open{display:flex}
-.winCard{
-  width:min(520px, 100%);
-  border-radius:22px;
-  border:1px solid rgba(34,50,70,.9);
-  background: linear-gradient(180deg, rgba(17,24,36,.98), rgba(10,14,20,.98));
-  box-shadow: 0 30px 90px rgba(0,0,0,.55);
-  padding:18px 16px;
-  text-align:center;
-}
-.winCard .h{font-size:28px; font-weight:1000; letter-spacing:.2px}
-.winCard .p{margin-top:8px; color:var(--muted); font-size:14px}
-.winCard .who{margin-top:10px; font-size:34px; font-weight:1000; color: var(--good)}
-.winCard .actions{margin-top:14px; display:flex; justify-content:center}
+    .winOverlay{
+      position:fixed; inset:0;
+      display:none;
+      align-items:center; justify-content:center;
+      background: rgba(0,0,0,.70);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 60;
+      padding:16px;
+    }
+    .winOverlay.open{display:flex}
+    .winCard{
+      width:min(520px, 100%);
+      border-radius:22px;
+      border:1px solid rgba(34,50,70,.9);
+      background: linear-gradient(180deg, rgba(17,24,36,.98), rgba(10,14,20,.98));
+      box-shadow: 0 30px 90px rgba(0,0,0,.55);
+      padding:18px 16px;
+      text-align:center;
+    }
+    .winCard .h{font-size:28px; font-weight:1000; letter-spacing:.2px}
+    .winCard .p{margin-top:8px; color:var(--muted); font-size:14px}
+    .winCard .who{margin-top:10px; font-size:34px; font-weight:1000; color: var(--good)}
+    .winCard .actions{margin-top:14px; display:flex; justify-content:center}
   </style>
 </head>
 <body>
@@ -459,7 +478,6 @@
     </div>
   </div>
 </div>
-
 
 <header>
   <div class="title">
@@ -483,7 +501,7 @@
         <div class="bigscore"><span id="score0">501</span> <small>Rest</small></div>
 
         <div class="row">
-          <div class="pill"><div class="k">Sätze</div><div class="v big" id="sets0">0</div></div>
+          <div class="pill"><div class="k">Saetze</div><div class="v big" id="sets0">0</div></div>
           <div class="pill"><div class="k">Legs (Satz)</div><div class="v big" id="legs0">0</div></div>
         </div>
 
@@ -498,7 +516,7 @@
           <li class="miniItem"><span class="k">Aufnahmen ≥ 100</span><span class="v" id="g100_0">0</span></li>
           <li class="miniItem"><span class="k">Aufnahmen ≥ 140</span><span class="v" id="g140_0">0</span></li>
           <li class="miniItem"><span class="k">Anzahl 180er</span><span class="v" id="d180_0">0</span></li>
-          <li class="miniItem"><span class="k">Höchstes Checkout</span><span class="v" id="hco_0">—</span></li>
+          <li class="miniItem"><span class="k">Hoechstes Checkout</span><span class="v" id="hco_0">—</span></li>
         </ul>
       </div>
     </section>
@@ -512,7 +530,7 @@
         <div class="bigscore"><span id="score1">501</span> <small>Rest</small></div>
 
         <div class="row">
-          <div class="pill"><div class="k">Sätze</div><div class="v big" id="sets1">0</div></div>
+          <div class="pill"><div class="k">Saetze</div><div class="v big" id="sets1">0</div></div>
           <div class="pill"><div class="k">Legs (Satz)</div><div class="v big" id="legs1">0</div></div>
         </div>
 
@@ -527,7 +545,7 @@
           <li class="miniItem"><span class="k">Aufnahmen ≥ 100</span><span class="v" id="g100_1">0</span></li>
           <li class="miniItem"><span class="k">Aufnahmen ≥ 140</span><span class="v" id="g140_1">0</span></li>
           <li class="miniItem"><span class="k">Anzahl 180er</span><span class="v" id="d180_1">0</span></li>
-          <li class="miniItem"><span class="k">Höchstes Checkout</span><span class="v" id="hco_1">—</span></li>
+          <li class="miniItem"><span class="k">Hoechstes Checkout</span><span class="v" id="hco_1">—</span></li>
         </ul>
       </div>
     </section>
@@ -539,14 +557,14 @@
       <div class="body">
         <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between">
           <div>
-            <div style="font-size:12px; color:var(--muted)">Sätze bis Matchgewinn</div>
+            <div style="font-size:12px; color:var(--muted)">Saetze bis Matchgewinn</div>
             <div style="margin-top:6px">
               <input id="setsToWin" type="number" min="1" max="25" step="1" inputmode="numeric"
                      style="width:160px; background:rgba(0,0,0,.28); border:1px solid var(--line); color:var(--txt); border-radius:12px; padding:10px 10px; font-size:16px; outline:none;">
             </div>
           </div>
           <div style="display:flex; gap:10px; flex-wrap:wrap">
-            <button class="primary" id="openEntryBtn" style="padding:14px 16px; font-size:16px; border-radius:14px">Eingabe öffnen</button>
+            <button class="primary" id="openEntryBtn" style="padding:14px 16px; font-size:16px; border-radius:14px">Eingabe oeffnen</button>
             <button class="ghost" id="switchBtn">Spieler wechseln</button>
             <button class="ghost" id="retourBtn">Retour</button>
           </div>
@@ -592,22 +610,22 @@
       <div class="restBar">
         <div class="restBox" id="restBox0">
           <div class="restMeta">
-  	<div class="name">Shark</div>
- 	 <div class="meta2">
-    	<div>Sätze: <span id="mSets0">0</span></div>
-    	<div>Legs: <span id="mLegs0">0</span></div>
-  	</div>
-   </div>
+            <div class="name">Shark</div>
+            <div class="meta2">
+              <div>Saetze: <span id="mSets0">0</span></div>
+              <div>Legs: <span id="mLegs0">0</span></div>
+            </div>
+          </div>
           <div class="rest" id="restModal0">501</div>
         </div>
         <div class="restBox" id="restBox1">
           <div class="restMeta">
-  <div class="name">Snake</div>
-  <div class="meta2">
-    <div>Sätze: <span id="mSets1">0</span></div>
-    <div>Legs: <span id="mLegs1">0</span></div>
-  </div>
-</div>
+            <div class="name">Snake</div>
+            <div class="meta2">
+              <div>Saetze: <span id="mSets1">0</span></div>
+              <div>Legs: <span id="mLegs1">0</span></div>
+            </div>
+          </div>
           <div class="rest" id="restModal1">501</div>
         </div>
       </div>
@@ -721,9 +739,9 @@
     winSub: el("winSub"),
     winWho: el("winWho"),
     winOkBtn: el("winOkBtn"),
-    dartsOverlay: el("dartsOverlay"),
-         dartsCancelBtn: el("dartsCancelBtn"),
 
+    dartsOverlay: el("dartsOverlay"),
+    dartsCancelBtn: el("dartsCancelBtn"),
   };
 
   const nowTime = () => {
@@ -751,8 +769,13 @@
     highestCheckout: null,
   });
 
+  // Leg-Starter: beginnt Leg 1 -> Player 0; danach immer wechselnd
   const freshState = () => ({
     setsToWin: 3,
+
+    legStarter: 0,
+    nextLegStarter: 1,
+
     currentPlayer: 0,
     currentSetNumber: 1,
     currentLegNumber: 1,
@@ -774,6 +797,12 @@
     try {
       const p = JSON.parse(raw);
       if (p && p.players && p.players.length === 2) state = p;
+
+      // Abwaertskompatibel: falls alte States ohne legStarter existieren
+      if (state.legStarter === undefined || state.legStarter === null) state.legStarter = 0;
+      if (state.nextLegStarter === undefined || state.nextLegStarter === null) state.nextLegStarter = state.legStarter === 0 ? 1 : 0;
+      if (state.currentPlayer === undefined || state.currentPlayer === null) state.currentPlayer = state.legStarter;
+
     } catch(e){}
   }
 
@@ -783,6 +812,10 @@
   function snapshot(){
     state.history.push(JSON.stringify({
       setsToWin: state.setsToWin,
+
+      legStarter: state.legStarter,
+      nextLegStarter: state.nextLegStarter,
+
       currentPlayer: state.currentPlayer,
       currentSetNumber: state.currentSetNumber,
       currentLegNumber: state.currentLegNumber,
@@ -800,6 +833,10 @@
     if (!state.history.length) return;
     const prev = JSON.parse(state.history.pop());
     state.setsToWin = prev.setsToWin;
+
+    state.legStarter = (prev.legStarter ?? 0);
+    state.nextLegStarter = (prev.nextLegStarter ?? (state.legStarter === 0 ? 1 : 0));
+
     state.currentPlayer = prev.currentPlayer;
     state.currentSetNumber = prev.currentSetNumber;
     state.currentLegNumber = prev.currentLegNumber;
@@ -853,7 +890,7 @@
       if (state.players[i].sets >= state.setsToWin){
         state.matchOver = true;
         state.winner = i;
-        pushLog({ player: players[i].name, input:"—", effect:"MATCH GEWONNEN", rest:"—", info:`bis ${state.setsToWin} Sätze` });
+        pushLog({ player: players[i].name, input:"—", effect:"MATCH GEWONNEN", rest:"—", info:`bis ${state.setsToWin} Saetze` });
         return true;
       }
     }
@@ -873,37 +910,35 @@
     if (startRest <= 170) p.checkoutAttempts++;
   }
 
-function askCheckoutMeta(){
-  const ok = confirm("Checkout? Bestaetige: Double Out getroffen?");
-  if (!ok) return Promise.resolve({ dartsUsed: 3, doubleOutConfirmed: false });
+  function askCheckoutMeta(){
+    const ok = confirm("Checkout? Bestaetige: Double Out getroffen?");
+    if (!ok) return Promise.resolve({ dartsUsed: 3, doubleOutConfirmed: false });
 
-  // statt prompt: Button-Popup
-  return new Promise((resolve) => {
-    ui.dartsOverlay.classList.add("open");
-    ui.dartsOverlay.setAttribute("aria-hidden","false");
+    return new Promise((resolve) => {
+      ui.dartsOverlay.classList.add("open");
+      ui.dartsOverlay.setAttribute("aria-hidden","false");
 
-    const cleanup = () => {
-      ui.dartsOverlay.classList.remove("open");
-      ui.dartsOverlay.setAttribute("aria-hidden","true");
-      ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(b => b.onclick = null);
-      ui.dartsCancelBtn.onclick = null;
-    };
+      const cleanup = () => {
+        ui.dartsOverlay.classList.remove("open");
+        ui.dartsOverlay.setAttribute("aria-hidden","true");
+        ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(b => b.onclick = null);
+        ui.dartsCancelBtn.onclick = null;
+      };
 
-    ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(btn => {
-      btn.onclick = () => {
-        const dartsUsed = Number(btn.getAttribute("data-darts")) || 3;
+      ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(btn => {
+        btn.onclick = () => {
+          const dartsUsed = Number(btn.getAttribute("data-darts")) || 3;
+          cleanup();
+          resolve({ dartsUsed, doubleOutConfirmed: true });
+        };
+      });
+
+      ui.dartsCancelBtn.onclick = () => {
         cleanup();
-        resolve({ dartsUsed, doubleOutConfirmed: true });
+        resolve(null);
       };
     });
-
-    ui.dartsCancelBtn.onclick = () => {
-      cleanup();
-      resolve(null); // entspricht deinem bisherigen "abbrechen"
-    };
-  });
-}
-
+  }
 
   function typedToNumber(){
     if (!state.typed) return null;
@@ -924,7 +959,6 @@ function askCheckoutMeta(){
     ui.entryOverlay.setAttribute("aria-hidden","true");
   }
 
-  // Standard-Checks (Auswahl). Wichtig: 148 war vorher nicht drin -> jetzt ist er drin.
   function checkoutSuggestions(rest){
     const map = {
       170:["T20 T20 Bull"],
@@ -937,7 +971,7 @@ function askCheckoutMeta(){
       153:["T20 T19 D18"],
       152:["T20 T20 D16"],
       150:["T20 T18 D18"],
-      148:["T20 T16 D20","T20 T20 D14"],   // <-- neu
+      148:["T20 T16 D20","T20 T20 D14"],
       147:["T20 T17 D18"],
       146:["T20 T18 D16"],
       145:["T20 T15 D20"],
@@ -992,7 +1026,6 @@ function askCheckoutMeta(){
       ui.checkoutHint.style.display = "flex";
       ui.checkoutList.innerHTML = "";
 
-      // Wenn keine Route hinterlegt: trotzdem Hinweis, aber ohne Verwirrung
       if (sug.length){
         sug.forEach(s => {
           const span = document.createElement("span");
@@ -1036,60 +1069,40 @@ function askCheckoutMeta(){
     save(); updateUI();
   }
 
-  async function bookVisit(){
-  if (state.matchOver) return;
-
-  const setsToWin = Number(ui.setsToWin.value);
-  if (Number.isFinite(setsToWin) && setsToWin >= 1) state.setsToWin = Math.floor(setsToWin);
-
-  let v = typedToNumber();
-  if (v === null) v = 0;
-  v = Math.max(0, Math.min(180, Math.floor(v)));
-
-  const i = state.currentPlayer;
-  const p = state.players[i];
-  const startRest = p.score;
-
-  snapshot();
-  handleCheckoutAttempt(p, startRest);
-
-  let dartsThisVisit = 3;
-  let newRest = startRest - v;
-
-  // Bust-Regeln
-  if (newRest < 0 || newRest === 1){
-    newRest = startRest;
-    countVisitBucket(p, 0);
-    p.totalDarts += dartsThisVisit;
-
-    pushLog({ player: players[i].name, input:String(v), effect:"0", rest:String(newRest), info:"Bust" });
-
-    clearTyped();
-    nextPlayer();
-    save(); updateUI();
-    return;
+  // Anwurf fuer naechstes Leg umschalten
+  function advanceLegStarter(){
+    state.legStarter = state.nextLegStarter;
+    state.nextLegStarter = state.legStarter === 0 ? 1 : 0;
+    state.currentPlayer = state.legStarter;
   }
 
-  // Checkout
-  if (newRest === 0){
-    const meta = await askCheckoutMeta();
-    if (meta === null){
-      restoreFromHistory();
-      return;
-    }
+  async function bookVisit(){
+    if (state.matchOver) return;
 
-    if (!meta.doubleOutConfirmed){
+    const setsToWin = Number(ui.setsToWin.value);
+    if (Number.isFinite(setsToWin) && setsToWin >= 1) state.setsToWin = Math.floor(setsToWin);
+
+    let v = typedToNumber();
+    if (v === null) v = 0;
+    v = Math.max(0, Math.min(180, Math.floor(v)));
+
+    const i = state.currentPlayer;
+    const p = state.players[i];
+    const startRest = p.score;
+
+    snapshot();
+    handleCheckoutAttempt(p, startRest);
+
+    let dartsThisVisit = 3;
+    let newRest = startRest - v;
+
+    // Bust-Regeln
+    if (newRest < 0 || newRest === 1){
       newRest = startRest;
       countVisitBucket(p, 0);
-      p.totalDarts += 3;
+      p.totalDarts += dartsThisVisit;
 
-      pushLog({
-        player: players[i].name,
-        input: String(v),
-        effect: "0",
-        rest: String(newRest),
-        info: "Checkout nicht bestaetigt (Bust)"
-      });
+      pushLog({ player: players[i].name, input:String(v), effect:"0", rest:String(newRest), info:"Bust" });
 
       clearTyped();
       nextPlayer();
@@ -1097,80 +1110,112 @@ function askCheckoutMeta(){
       return;
     }
 
-    dartsThisVisit = meta.dartsUsed;
+    // Checkout
+    if (newRest === 0){
+      const meta = await askCheckoutMeta();
+      if (meta === null){
+        restoreFromHistory();
+        return;
+      }
 
-    countVisitBucket(p, v);
-    p.totalPoints += v;
-    p.totalDarts += dartsThisVisit;
+      if (!meta.doubleOutConfirmed){
+        newRest = startRest;
+        countVisitBucket(p, 0);
+        p.totalDarts += 3;
 
-    p.checkoutHits++;
+        pushLog({
+          player: players[i].name,
+          input: String(v),
+          effect: "0",
+          rest: String(newRest),
+          info: "Checkout nicht bestaetigt (Bust)"
+        });
 
-    const coVal = startRest;
-    if (p.highestCheckout == null || coVal > p.highestCheckout){
-      p.highestCheckout = coVal;
-    }
-
-    p.legsInSet += 1;
-
-    pushLog({
-      player: players[i].name,
-      input: String(v),
-      effect: `Checkout (${coVal})`,
-      rest: "0",
-      info: `${dartsThisVisit} Dart(s)`
-    });
-
-    showWinPopup("LEG SIEG", `Satz ${state.currentSetNumber} · Leg ${state.currentLegNumber}`, players[i].name);
-
-    if (p.legsInSet >= state.legsToWinSet){
-      p.sets += 1;
-
-      pushLog({
-        player: players[i].name,
-        input: "—",
-        effect: "SATZ GEWONNEN",
-        rest: "—",
-        info: `Legs ${state.legsToWinSet}:0`
-      });
-
-      showWinPopup("SATZ SIEG", `Satz ${state.currentSetNumber} abgeschlossen`, players[i].name);
-
-      state.currentSetNumber += 1;
-      state.currentLegNumber = 1;
-
-      resetLegForNewSet();
-      resetLegScores();
-
-      state.currentPlayer = i;
-      clearTyped();
-
-      if (checkMatchWinner()){
+        clearTyped();
+        nextPlayer();
         save(); updateUI();
         return;
       }
-    } else {
-      state.currentLegNumber += 1;
-      resetLegScores();
-      state.currentPlayer = i;
-      clearTyped();
+
+      dartsThisVisit = meta.dartsUsed;
+
+      countVisitBucket(p, v);
+      p.totalPoints += v;
+      p.totalDarts += dartsThisVisit;
+
+      p.checkoutHits++;
+
+      const coVal = startRest;
+      if (p.highestCheckout == null || coVal > p.highestCheckout){
+        p.highestCheckout = coVal;
+      }
+
+      p.legsInSet += 1;
+
+      pushLog({
+        player: players[i].name,
+        input: String(v),
+        effect: `Checkout (${coVal})`,
+        rest: "0",
+        info: `${dartsThisVisit} Dart(s)`
+      });
+
+      showWinPopup("LEG SIEG", `Satz ${state.currentSetNumber} · Leg ${state.currentLegNumber}`, players[i].name);
+
+      // Satz gewonnen?
+      if (p.legsInSet >= state.legsToWinSet){
+        p.sets += 1;
+
+        pushLog({
+          player: players[i].name,
+          input: "—",
+          effect: "SATZ GEWONNEN",
+          rest: "—",
+          info: `Legs ${state.legsToWinSet}:0`
+        });
+
+        showWinPopup("SATZ SIEG", `Satz ${state.currentSetNumber} abgeschlossen`, players[i].name);
+
+        state.currentSetNumber += 1;
+        state.currentLegNumber = 1;
+
+        resetLegForNewSet();
+        resetLegScores();
+
+        // Anwurf wechselt nach jedem Leg (auch nach Satz)
+        advanceLegStarter();
+        clearTyped();
+
+        if (checkMatchWinner()){
+          save(); updateUI();
+          return;
+        }
+      } else {
+        // Naechstes Leg im selben Satz
+        state.currentLegNumber += 1;
+        resetLegScores();
+
+        // Anwurf wechselt nach jedem Leg
+        advanceLegStarter();
+        clearTyped();
+      }
+
+      save(); updateUI();
+      return;
     }
 
+    // Normaler Wurf
+    countVisitBucket(p, v);
+    p.totalPoints += v;
+    p.totalDarts += dartsThisVisit;
+    p.score = newRest;
+
+    pushLog({ player: players[i].name, input:String(v), effect:`-${v}`, rest:String(newRest), info:"" });
+
+    clearTyped();
+    nextPlayer();
     save(); updateUI();
-    return;
   }
-
-  // Normaler Wurf (kein Bust, kein Checkout)
-  countVisitBucket(p, v);
-  p.totalPoints += v;
-  p.totalDarts += dartsThisVisit;
-  p.score = newRest;
-
-  pushLog({ player: players[i].name, input:String(v), effect:`-${v}`, rest:String(newRest), info:"" });
-
-  clearTyped();
-  nextPlayer();
-  save(); updateUI();
-}
 
   function switchPlayerManual(){
     if (state.matchOver) return;
@@ -1190,7 +1235,6 @@ function askCheckoutMeta(){
   }
 
   function renderKeypads(){
-    // Quickbuttons
     const quick = [26,41,45,60,81,85,100];
     ui.quickRow.innerHTML = "";
     quick.forEach(v => {
@@ -1205,7 +1249,6 @@ function askCheckoutMeta(){
       ui.quickRow.appendChild(b);
     });
 
-    // Pad: 1..9, dann unten: (Loeschen letzte) (0) (Loeschen)
     ui.pad.innerHTML = "";
 
     const mkNum = (n) => {
@@ -1218,7 +1261,6 @@ function askCheckoutMeta(){
 
     [1,2,3,4,5,6,7,8,9].forEach(n => ui.pad.appendChild(mkNum(n)));
 
-    // Bottom-left: Backspace with text
     const back = document.createElement("button");
     back.type = "button";
     back.className = "action";
@@ -1226,10 +1268,8 @@ function askCheckoutMeta(){
     back.addEventListener("click", backspace);
     ui.pad.appendChild(back);
 
-    // Bottom-middle: 0
     ui.pad.appendChild(mkNum(0));
 
-    // Bottom-right: Clear -> Loeschen
     const clr = document.createElement("button");
     clr.type = "button";
     clr.className = "action";
@@ -1240,7 +1280,10 @@ function askCheckoutMeta(){
 
   function updateTurnHighlight(){
     for (let i=0;i<2;i++){
-      ui.card[i].classList.toggle("turn", !state.matchOver && state.currentPlayer === i);
+      ui.card[i].classList.remove("turn","turn0","turn1");
+      if (!state.matchOver && state.currentPlayer === i){
+        ui.card[i].classList.add(i === 0 ? "turn0" : "turn1");
+      }
 
       const b = ui.badge[i];
       b.classList.remove("turn","winner");
@@ -1254,8 +1297,11 @@ function askCheckoutMeta(){
         b.textContent = "—";
       }
     }
-    ui.restBox0.classList.toggle("turn", !state.matchOver && state.currentPlayer === 0);
-    ui.restBox1.classList.toggle("turn", !state.matchOver && state.currentPlayer === 1);
+
+    ui.restBox0.classList.remove("turn","turn0","turn1");
+    ui.restBox1.classList.remove("turn","turn0","turn1");
+    if (!state.matchOver && state.currentPlayer === 0) ui.restBox0.classList.add("turn0");
+    if (!state.matchOver && state.currentPlayer === 1) ui.restBox1.classList.add("turn1");
   }
 
   function updateUI(){
@@ -1265,7 +1311,7 @@ function askCheckoutMeta(){
     ui.curSet.textContent = state.currentSetNumber;
     ui.curLeg.textContent = state.currentLegNumber;
 
-    ui.matchInfo.textContent = `Match bis ${state.setsToWin} Sätze · Satzmodus: First to ${state.legsToWinSet} Winlegs · 501 Double Out`;
+    ui.matchInfo.textContent = `Match bis ${state.setsToWin} Saetze · Satzmodus: First to ${state.legsToWinSet} Winlegs · 501 Double Out`;
 
     for (let i=0;i<2;i++){
       const p = state.players[i];
@@ -1303,18 +1349,17 @@ function askCheckoutMeta(){
       </tr>
     `).join("");
 
-    // modal
     ui.restModal0.textContent = state.players[0].score;
     ui.restModal1.textContent = state.players[1].score;
     ui.turnNameModal.textContent = players[state.currentPlayer].name;
     ui.curSetModal.textContent = state.currentSetNumber;
     ui.curLegModal.textContent = state.currentLegNumber;
     ui.typedValue.textContent = state.typed ? state.typed : "—";
-    // modal: Saetze/Legs pro Spieler
-ui.mSets[0].textContent = state.players[0].sets;
-ui.mSets[1].textContent = state.players[1].sets;
-ui.mLegs[0].textContent = state.players[0].legsInSet;
-ui.mLegs[1].textContent = state.players[1].legsInSet;
+
+    ui.mSets[0].textContent = state.players[0].sets;
+    ui.mSets[1].textContent = state.players[1].sets;
+    ui.mLegs[0].textContent = state.players[0].legsInSet;
+    ui.mLegs[1].textContent = state.players[1].legsInSet;
 
     updateCheckoutHint();
     updateTurnHighlight();
@@ -1346,6 +1391,12 @@ ui.mLegs[1].textContent = state.players[1].legsInSet;
   // init
   load();
   if (!Number.isFinite(state.setsToWin) || state.setsToWin < 1) state.setsToWin = 3;
+
+  // Sicherstellen: currentPlayer passt zum aktuellen Leg-Starter
+  if (state.legStarter === undefined || state.legStarter === null) state.legStarter = 0;
+  if (state.nextLegStarter === undefined || state.nextLegStarter === null) state.nextLegStarter = state.legStarter === 0 ? 1 : 0;
+  if (state.currentPlayer === undefined || state.currentPlayer === null) state.currentPlayer = state.legStarter;
+
   renderKeypads();
   updateUI();
 })();
