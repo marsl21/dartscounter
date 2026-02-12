@@ -943,34 +943,33 @@
   }
 
   function askCheckoutMeta(){
-    const ok = confirm("Checkout? Bestaetige: Double Out getroffen?");
-    if (!ok) return Promise.resolve({ dartsUsed: 3, doubleOutConfirmed: false });
+  // Kein Windows-confirm mehr -> direkt Button-Popup
+  return new Promise((resolve) => {
+    ui.dartsOverlay.classList.add("open");
+    ui.dartsOverlay.setAttribute("aria-hidden","false");
 
-    return new Promise((resolve) => {
-      ui.dartsOverlay.classList.add("open");
-      ui.dartsOverlay.setAttribute("aria-hidden","false");
+    const cleanup = () => {
+      ui.dartsOverlay.classList.remove("open");
+      ui.dartsOverlay.setAttribute("aria-hidden","true");
+      ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(b => b.onclick = null);
+      ui.dartsCancelBtn.onclick = null;
+    };
 
-      const cleanup = () => {
-        ui.dartsOverlay.classList.remove("open");
-        ui.dartsOverlay.setAttribute("aria-hidden","true");
-        ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(b => b.onclick = null);
-        ui.dartsCancelBtn.onclick = null;
-      };
-
-      ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(btn => {
-        btn.onclick = () => {
-          const dartsUsed = Number(btn.getAttribute("data-darts")) || 3;
-          cleanup();
-          resolve({ dartsUsed, doubleOutConfirmed: true });
-        };
-      });
-
-      ui.dartsCancelBtn.onclick = () => {
+    ui.dartsOverlay.querySelectorAll("button[data-darts]").forEach(btn => {
+      btn.onclick = () => {
+        const dartsUsed = Number(btn.getAttribute("data-darts")) || 3;
         cleanup();
-        resolve(null);
+        resolve({ dartsUsed, doubleOutConfirmed: true });
       };
     });
-  }
+
+    ui.dartsCancelBtn.onclick = () => {
+      cleanup();
+      resolve(null); // entspricht "abbrechen" (Restore aus History)
+    };
+  });
+}
+s
 
   function typedToNumber(){
     if (!state.typed) return null;
